@@ -231,6 +231,31 @@ footer .fnm{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;lette
 footer .fnm small{color:var(--cyan)}
 footer .fl{font-size:12px;margin-top:8px;letter-spacing:.08em}
 footer a{color:var(--cyan);text-decoration:none}
+
+/* Bandeau d'événement (tournoi vedette / cash prize) */
+.event-banner{position:relative;overflow:hidden;margin-bottom:24px;
+  background:linear-gradient(150deg,#12202E,#0E1520 60%);border:1px solid var(--bordure-cyan);
+  border-radius:18px;padding:26px 28px;text-align:center}
+.ev-glow{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 520px 240px at 50% -10%, rgba(56,198,230,.14), transparent 62%),
+             radial-gradient(ellipse 420px 200px at 88% 120%, rgba(230,184,76,.12), transparent 64%)}
+.ev-badge{position:relative;display:inline-block;font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--or);border:1px solid rgba(230,184,76,.5);
+  border-radius:99px;padding:6px 16px;background:rgba(230,184,76,.08);margin-bottom:18px}
+.ev-grid{position:relative;display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap}
+.ev-prix-lbl{font-family:'Oswald',sans-serif;font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--argent)}
+.ev-prix-montant{font-family:'Bebas Neue',sans-serif;font-size:62px;line-height:1;letter-spacing:.02em;margin:2px 0;
+  background:var(--grad-or);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 20px rgba(230,184,76,.28))}
+.ev-prix-sous{color:var(--glace);font-size:13.5px;font-weight:500}
+.ev-jours{display:flex;flex-direction:column;gap:12px}
+.ev-jour{display:flex;align-items:center;gap:14px;text-align:left;background:rgba(56,198,230,.05);
+  border:1px solid var(--bordure);border-radius:12px;padding:10px 16px}
+.ev-j-date{font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:1;color:var(--cyan);min-width:38px;text-align:center}
+.ev-jour div{display:flex;flex-direction:column;line-height:1.25}
+.ev-jour b{font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+.ev-jour span{font-size:12.5px;color:var(--argent)}
+@media(max-width:560px){.ev-grid{gap:22px}.ev-prix-montant{font-size:52px}}
 </style>
 </head>
 <body>
@@ -274,6 +299,24 @@ footer a{color:var(--cyan);text-decoration:none}
   <!-- TOURNOIS -->
   <section class="page" id="tournois">
     <div class="page-head"><div class="eyebrow" data-i18n="to.eyebrow">Événements</div><h2 data-i18n="to.titre">Tournois</h2><p data-i18n="to.sous">Tous les tournois de la ligue — à venir, en cours et terminés.</p></div>
+
+    <div class="event-banner">
+      <div class="ev-glow"></div>
+      <div class="ev-badge" data-i18n="ev.badge">⭐ 1er tournoi organisé</div>
+      <div class="ev-grid">
+        <div class="ev-prix">
+          <div class="ev-prix-lbl" data-i18n="ev.prixLbl">Bourse totale</div>
+          <div class="ev-prix-montant">100&nbsp;$</div>
+          <div class="ev-prix-sous" data-i18n="ev.prixSous">25&nbsp;$ par joueur de l'équipe championne</div>
+        </div>
+        <div class="ev-jours">
+          <div class="ev-jour"><span class="ev-j-date">17</span><div><b data-i18n="ev.j1t">17 juillet</b><span data-i18n="ev.j1s">Qualifications</span></div></div>
+          <div class="ev-jour"><span class="ev-j-date">18</span><div><b data-i18n="ev.j2t">18 juillet</b><span data-i18n="ev.j2s">Phase éliminatoire</span></div></div>
+        </div>
+      </div>
+      <a class="btn btn-cyan" href="#inscriptions" style="margin-top:18px" data-i18n="ev.cta">S'inscrire au tournoi →</a>
+    </div>
+
     <div class="admin-panel admin-only">
       <div class="lbl" data-i18n="to.adm">Admin · Nouveau tournoi</div>
       <input id="to-nom" placeholder="Nom du tournoi (ex. Coupe d'ouverture)" data-i18n-ph="to.ph.nom">
@@ -424,6 +467,8 @@ const DICT = {
   'to.ph.nom':'Nom du tournoi (ex. Coupe d\'ouverture)','to.ph.date':'Date (ex. 15 août 2026)','to.ph.poules':'Nombre de poules (ex. 2)','to.ph.desc':'Description (optionnel)',
   'to.voirPoules':'Voir poules','to.voir':'Voir le tournoi','to.supprimer':'Supprimer','to.champion':'— Champion —',
   'to.vide.t':'Aucun tournoi','to.vide.s':'Le premier tournoi arrive bientôt.',
+  'ev.badge':'⭐ 1er tournoi organisé','ev.prixLbl':'Bourse totale','ev.prixSous':'25 $ par joueur de l\'équipe championne',
+  'ev.j1t':'17 juillet','ev.j1s':'Qualifications','ev.j2t':'18 juillet','ev.j2s':'Phase éliminatoire','ev.cta':'S\'inscrire au tournoi →',
   'st.inscriptions':'Inscriptions ouvertes','st.poules':'Phase de poules','st.eliminatoires':'Éliminatoires','st.termine':'Terminé',
   'meta.equipes':'équipes','meta.poules':'poule(s)','meta.avenir':'À venir','cup.champion':'Champion',
   'insc.eyebrow':'Participer','insc.titre':'Inscriptions','insc.sous':'Inscris-toi comme joueur — les équipes seront formées au repêchage.',
@@ -452,6 +497,8 @@ const DICT = {
   'to.ph.nom':'Tournament name (e.g. Opening Cup)','to.ph.date':'Date (e.g. Aug 15, 2026)','to.ph.poules':'Number of groups (e.g. 2)','to.ph.desc':'Description (optional)',
   'to.voirPoules':'View groups','to.voir':'View tournament','to.supprimer':'Delete','to.champion':'— Champion —',
   'to.vide.t':'No tournaments','to.vide.s':'The first tournament is coming soon.',
+  'ev.badge':'⭐ First tournament ever','ev.prixLbl':'Total prize pool','ev.prixSous':'$25 per player on the winning team',
+  'ev.j1t':'July 17','ev.j1s':'Qualifiers','ev.j2t':'July 18','ev.j2s':'Playoffs','ev.cta':'Register for the tournament →',
   'st.inscriptions':'Registration open','st.poules':'Group stage','st.eliminatoires':'Playoffs','st.termine':'Finished',
   'meta.equipes':'teams','meta.poules':'group(s)','meta.avenir':'TBD','cup.champion':'Champion',
   'insc.eyebrow':'Take part','insc.titre':'Registration','insc.sous':'Register as a player — teams are formed through a draft.',
