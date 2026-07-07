@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DYNASTY — Tournois</title>
+<meta name="description" content="Les tournois de la Dynasty Hockey League — poules, éliminatoires et la route vers la Coupe. NHL 27 · World of Chel.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --nuit:#0A0E17; --nuit2:#070A11; --acier:#141B2A; --acier2:#0F1520;
+  --glace:#EAF2FA; --argent:#8FA3B8; --argent2:#5C6B7E;
+  --cyan:#38C6E6; --cyan-clair:#7FE0F4; --cyan-fonce:#1B8FB0;
+  --or:#E6B84C; --or-clair:#F5D98A;
+  --rouge:#E0556B; --vert:#5FD69A;
+  --bordure:rgba(120,160,190,.14); --bordure-cyan:rgba(56,198,230,.35);
+  --grad-cyan:linear-gradient(120deg,#7FE0F4,#38C6E6 55%,#1B8FB0);
+  --grad-or:linear-gradient(120deg,#F5D98A,#E6B84C 55%,#B98E28);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--nuit);color:var(--glace);font-family:'Inter',sans-serif;line-height:1.6;
+  min-height:100vh;overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse 900px 500px at 50% -8%, rgba(56,198,230,.10), transparent 60%),
+    radial-gradient(ellipse 700px 600px at 100% 100%, rgba(56,198,230,.05), transparent 60%);
+  background-attachment:fixed;
+}
+::selection{background:rgba(56,198,230,.3)}
+h1,h2,h3,.osw{font-family:'Oswald',sans-serif}
+.num{font-family:'Bebas Neue',sans-serif;letter-spacing:.03em}
+
+/* ---------- Barre du haut ---------- */
+header{position:sticky;top:0;z-index:50;background:rgba(10,14,23,.82);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--bordure)}
+.topbar{max-width:1180px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:inherit;flex:none}
+.brand img{width:38px;height:38px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
+.brand .nm{font-family:'Oswald',sans-serif;font-weight:700;font-size:19px;letter-spacing:.16em;line-height:1;
+  display:flex;flex-direction:column}
+.brand .nm small{font-size:8.5px;font-weight:400;letter-spacing:.42em;color:var(--cyan);margin-top:3px}
+nav{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.nav-link{font-size:13px;font-weight:600;letter-spacing:.02em;color:var(--argent);text-decoration:none;
+  padding:8px 13px;border-radius:8px;transition:.15s;white-space:nowrap}
+.nav-link:hover{color:var(--glace);background:rgba(56,198,230,.08)}
+.nav-link.actif{color:var(--nuit);background:var(--grad-cyan);font-weight:700}
+.admin-btn{flex:none;width:38px;height:38px;border-radius:9px;border:1px solid var(--bordure-cyan);
+  background:rgba(56,198,230,.06);color:var(--cyan);font-size:17px;cursor:pointer;transition:.15s}
+.admin-btn:hover{background:rgba(56,198,230,.14)}
+
+/* ---------- Pages ---------- */
+main{max-width:1180px;margin:0 auto;padding:34px 22px 90px}
+.page{display:none;animation:fade .4s ease}
+.page.actif{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.page-head{margin-bottom:26px}
+.eyebrow{font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;letter-spacing:.32em;color:var(--cyan);text-transform:uppercase}
+.page-head h2{font-size:38px;font-weight:700;letter-spacing:.02em;margin-top:5px;text-transform:uppercase}
+.page-head p{color:var(--argent);max-width:640px;margin-top:4px}
+.page-head::after{content:'';display:block;width:58px;height:3px;margin-top:14px;border-radius:3px;background:var(--grad-cyan)}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;text-align:center;padding:46px 0 20px;overflow:hidden}
+.spot{position:absolute;left:50%;top:-40px;transform:translateX(-50%);width:620px;height:520px;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 0%, rgba(56,198,230,.16), transparent 62%)}
+.rink-lines{position:absolute;inset:0;pointer-events:none;opacity:.5}
+.rink-lines::before,.rink-lines::after{content:'';position:absolute;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(56,198,230,.25) 30%,rgba(56,198,230,.25) 70%,transparent)}
+.rink-lines::before{top:20%}.rink-lines::after{bottom:16%}
+.hero img.crest{width:150px;position:relative;filter:drop-shadow(0 12px 30px rgba(0,0,0,.6));margin-bottom:8px}
+.hero h1{position:relative;font-size:clamp(46px,9vw,88px);font-weight:700;letter-spacing:.04em;line-height:.98;text-transform:uppercase}
+.hero h1 .gr{background:var(--grad-cyan);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero .kicker{position:relative;font-family:'Oswald',sans-serif;font-weight:300;font-size:clamp(18px,3.4vw,26px);
+  letter-spacing:.42em;text-indent:.42em;color:var(--argent);margin-top:8px;text-transform:uppercase}
+.hero .sub{position:relative;color:var(--argent);margin-top:16px;font-size:15.5px}
+.hero .cta{position:relative;margin-top:26px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* ---------- Boutons ---------- */
+.btn{font-family:'Oswald',sans-serif;font-weight:600;letter-spacing:.04em;font-size:14.5px;text-transform:uppercase;
+  padding:12px 26px;border-radius:10px;border:1px solid transparent;cursor:pointer;transition:.15s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-cyan{background:var(--grad-cyan);color:var(--nuit);box-shadow:0 6px 20px rgba(56,198,230,.22)}
+.btn-cyan:hover{transform:translateY(-1px);box-shadow:0 9px 26px rgba(56,198,230,.32)}
+.btn-ghost{background:rgba(120,160,190,.06);color:var(--glace);border-color:var(--bordure-cyan)}
+.btn-ghost:hover{background:rgba(56,198,230,.1)}
+.btn-mini{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;padding:6px 12px;border-radius:7px;cursor:pointer;
+  background:rgba(120,160,190,.08);border:1px solid var(--bordure-cyan);color:var(--cyan);transition:.15s;text-transform:none;letter-spacing:0}
+.btn-mini:hover{background:rgba(56,198,230,.14)}
+.btn-mini.ok{border-color:rgba(95,214,154,.4);color:var(--vert)}
+.del-btn{font-size:12px;font-weight:600;padding:6px 12px;border-radius:7px;cursor:pointer;
+  background:rgba(224,85,107,.08);border:1px solid rgba(224,85,107,.35);color:var(--rouge);transition:.15s}
+.del-btn:hover{background:rgba(224,85,107,.16)}
+
+/* ---------- Cartes / panneaux ---------- */
+.grille{display:grid;gap:16px}
+.g-auto{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.carte{background:linear-gradient(160deg,var(--acier),var(--acier2));border:1px solid var(--bordure);
+  border-radius:16px;padding:20px;position:relative;transition:.18s}
+.carte.clic{cursor:pointer}
+.carte.clic:hover{border-color:var(--bordure-cyan);transform:translateY(-2px)}
+.admin-panel{background:rgba(56,198,230,.04);border:1px dashed var(--bordure-cyan);border-radius:14px;padding:18px;margin-bottom:20px}
+.admin-panel .lbl{font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;letter-spacing:.16em;color:var(--cyan);text-transform:uppercase;margin-bottom:12px}
+input,select,textarea{width:100%;background:var(--nuit2);border:1px solid var(--bordure);border-radius:9px;
+  padding:11px 13px;color:var(--glace);font-family:inherit;font-size:14px;margin-bottom:10px;transition:.15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(56,198,230,.12)}
+textarea{resize:vertical;min-height:70px}
+label.chk{display:flex;align-items:center;gap:9px;color:var(--argent);font-size:13.5px;margin-bottom:10px;cursor:pointer}
+label.chk input{width:auto;margin:0;accent-color:var(--cyan)}
+.champ-lbl{display:block;font-size:12px;font-weight:600;letter-spacing:.05em;color:var(--argent);margin-bottom:5px;text-transform:uppercase}
+.deux-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.deux-cols{grid-template-columns:1fr}}
+
+/* Statut pills */
+.statut{display:inline-flex;align-items:center;gap:6px;font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;padding:4px 11px;border-radius:99px}
+.statut::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.st-inscriptions{background:rgba(95,214,154,.12);color:var(--vert)}
+.st-poules{background:rgba(56,198,230,.12);color:var(--cyan)}
+.st-eliminatoires{background:rgba(230,184,76,.14);color:var(--or)}
+.st-termine{background:rgba(140,163,184,.12);color:var(--argent)}
+
+/* Carte tournoi */
+.t-carte h3{font-family:'Oswald',sans-serif;font-size:22px;font-weight:600;text-transform:uppercase;letter-spacing:.02em;margin-bottom:4px}
+.t-carte .meta{display:flex;gap:14px;flex-wrap:wrap;color:var(--argent);font-size:13px;margin-top:10px}
+.t-carte .meta b{color:var(--glace);font-weight:700}
+.t-carte .barre{height:3px;border-radius:3px;margin:14px 0;background:var(--grad-cyan);opacity:.7}
+.t-carte.champ{border-color:rgba(230,184,76,.4)}
+.t-carte .cup{color:var(--or);font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;margin-top:8px}
+
+/* Tables (poules) */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--bordure);border-radius:14px}
+table{width:100%;border-collapse:collapse;min-width:440px}
+thead th{font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--argent);text-align:center;padding:12px 8px;background:rgba(120,160,190,.04)}
+thead th.eq,tbody td.eq{text-align:left;padding-left:16px}
+tbody td{text-align:center;padding:12px 8px;font-size:14px;border-top:1px solid var(--bordure);font-variant-numeric:tabular-nums}
+tbody tr:hover{background:rgba(56,198,230,.03)}
+.rang{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--argent);width:44px}
+.pts{font-family:'Bebas Neue',sans-serif;font-size:19px;color:var(--cyan)}
+tr.q .rang{color:var(--cyan)} /* qualifié */
+tr.q td.eq::after{content:' ✓';color:var(--vert);font-size:11px}
+.pastille{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px;vertical-align:middle}
+.pool-titre{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cyan);margin:26px 0 12px;display:flex;align-items:center;gap:10px}
+.pool-titre::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--bordure-cyan),transparent)}
+
+/* Matchs (ligne de score) */
+.match-l{display:flex;align-items:center;gap:12px;background:var(--acier2);border:1px solid var(--bordure);
+  border-radius:11px;padding:11px 14px;margin-bottom:8px}
+.match-l .e{flex:1;display:flex;align-items:center;gap:8px;font-size:14px;min-width:0}
+.match-l .e.d{justify-content:flex-end;text-align:right}
+.match-l .e span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.match-l .sc{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.06em;flex:none;min-width:76px;text-align:center;color:var(--glace)}
+.match-l .sc small{color:var(--argent2);font-size:16px;margin:0 3px}
+.match-l .gagne{color:var(--cyan);font-weight:700}
+.match-l.avenir .sc{color:var(--argent2);font-size:14px;font-family:'Oswald',sans-serif}
+
+/* ---------- Bracket ---------- */
+.bracket{display:flex;gap:34px;overflow-x:auto;padding:8px 4px 20px}
+.col-ph{flex:none;min-width:230px;display:flex;flex-direction:column;justify-content:space-around;gap:16px}
+.col-ph .ph-titre{font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--argent);text-align:center;margin-bottom:4px;padding-bottom:8px;border-bottom:1px solid var(--bordure)}
+.br-match{background:var(--acier);border:1px solid var(--bordure);border-radius:11px;overflow:hidden}
+.br-team{display:flex;align-items:center;gap:8px;padding:10px 12px;font-size:13.5px}
+.br-team+.br-team{border-top:1px solid var(--bordure)}
+.br-team .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.br-team .s{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--argent)}
+.br-team.win{background:rgba(56,198,230,.08)}
+.br-team.win .nm{color:var(--cyan);font-weight:700}
+.br-team.win .s{color:var(--cyan)}
+.col-ph.finale .br-match{border-color:var(--bordure-cyan);box-shadow:0 0 24px rgba(56,198,230,.1)}
+.champion-box{flex:none;min-width:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.champion-box .cup-ico{font-size:52px;filter:drop-shadow(0 0 18px rgba(230,184,76,.5))}
+.champion-box .lbl{font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--or);margin-top:6px}
+.champion-box .nm{font-family:'Oswald',sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;margin-top:6px;
+  background:var(--grad-or);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.champion-box .attente{color:var(--argent2);font-size:13px;margin-top:8px}
+
+/* Sélecteur de tournoi actif */
+.select-tournoi{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;
+  background:var(--acier2);border:1px solid var(--bordure);border-radius:12px;padding:12px 16px}
+.select-tournoi label{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--argent)}
+.select-tournoi select{width:auto;margin:0;min-width:220px;flex:1}
+
+/* Vide */
+.vide{text-align:center;padding:52px 20px;color:var(--argent)}
+.vide .ico{font-size:40px;margin-bottom:12px;opacity:.6}
+.vide b{display:block;font-family:'Oswald',sans-serif;font-size:19px;font-weight:600;color:var(--glace);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+.vide span{font-size:14px}
+
+/* Champions grille */
+.champ-carte{text-align:center;border-color:rgba(230,184,76,.3)}
+.champ-carte .cup{font-size:40px;filter:drop-shadow(0 0 14px rgba(230,184,76,.4))}
+.champ-carte .t-nom{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--argent);margin:8px 0 3px}
+.champ-carte .gagnant{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;
+  background:var(--grad-or);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.champ-carte .an{color:var(--argent2);font-size:12px;margin-top:4px}
+
+/* Modale */
+.modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(6,9,16,.8);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modal-box{background:linear-gradient(160deg,var(--acier),var(--acier2));border:1px solid var(--bordure-cyan);
+  border-radius:18px;padding:26px;max-width:460px;width:100%;max-height:90vh;overflow:auto}
+.modal-box h3{font-family:'Oswald',sans-serif;font-size:22px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:16px;text-align:center}
+.cta-row{display:flex;gap:10px;margin-top:6px}
+.cta-row .btn{flex:1;justify-content:center}
+.msg-ok{background:rgba(95,214,154,.1);border:1px solid rgba(95,214,154,.4);color:var(--vert);
+  border-radius:10px;padding:12px;font-size:13.5px;text-align:center;margin-top:12px}
+
+/* Admin visibilité */
+.admin-only{display:none}
+body.is-admin .admin-only{display:block}
+body.is-admin .admin-only.inline{display:inline-flex}
+.ic-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.insc-etape{display:flex;align-items:flex-start;gap:12px;padding:9px 0;font-size:14px;color:var(--argent);border-top:1px solid var(--bordure)}
+.insc-etape:first-of-type{border-top:none}
+.insc-etape b{color:var(--glace)}
+.insc-num{flex:none;width:26px;height:26px;border-radius:50%;background:rgba(56,198,230,.12);color:var(--cyan);
+  font-family:'Bebas Neue',sans-serif;font-size:16px;display:flex;align-items:center;justify-content:center}
+.lang-btn{flex:none;height:38px;padding:0 13px;border-radius:9px;border:1px solid var(--bordure-cyan);
+  background:rgba(56,198,230,.06);color:var(--cyan);font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;
+  letter-spacing:.08em;cursor:pointer;transition:.15s}
+.lang-btn:hover{background:rgba(56,198,230,.14)}
+
+/* Footer */
+footer{border-top:1px solid var(--bordure);text-align:center;padding:34px 20px;color:var(--argent2)}
+footer .fnm{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;letter-spacing:.2em;color:var(--glace);text-transform:uppercase}
+footer .fnm small{color:var(--cyan)}
+footer .fl{font-size:12px;margin-top:8px;letter-spacing:.08em}
+footer a{color:var(--cyan);text-decoration:none}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="topbar">
+    <a class="brand" href="#accueil">
+      <img src="logo.png" alt="">
+      <span class="nm">DYNASTY<small>TOURNOIS</small></span>
+    </a>
+    <nav>
+      <a class="nav-link" data-route="accueil" href="#accueil" data-i18n="nav.accueil">Accueil</a>
+      <a class="nav-link" data-route="tournois" href="#tournois" data-i18n="nav.tournois">Tournois</a>
+      <a class="nav-link" data-route="inscriptions" href="#inscriptions" data-i18n="nav.inscriptions">Inscriptions</a>
+      <a class="nav-link" data-route="poules" href="#poules" data-i18n="nav.poules">Poules</a>
+      <a class="nav-link" data-route="bracket" href="#bracket" data-i18n="nav.bracket">Éliminatoires</a>
+      <a class="nav-link" data-route="champions" href="#champions" data-i18n="nav.champions">Champions</a>
+    </nav>
+    <button class="lang-btn" id="lang-btn" onclick="basculerLangue()" title="Language / Langue">EN</button>
+    <button class="admin-btn" onclick="ouvrirLogin()" title="Mode admin">🏒</button>
+  </div>
+</header>
+
+<main>
+  <!-- ACCUEIL -->
+  <section class="page actif" id="accueil">
+    <div class="hero">
+      <div class="spot"></div><div class="rink-lines"></div>
+      <img class="crest" src="logo.png" alt="">
+      <h1><span class="gr" data-i18n="hero.titre">TOURNOIS</span></h1>
+      <div class="kicker">Dynasty Hockey League</div>
+      <p class="sub" data-i18n="hero.sous">Poules, éliminatoires et la route vers la Coupe. NHL 27 · World of Chel.</p>
+      <div class="cta">
+        <a class="btn btn-cyan" href="#inscriptions" data-i18n="hero.cta1">M'inscrire</a>
+        <a class="btn btn-ghost" href="#tournois" data-i18n="hero.cta2">Voir les tournois</a>
+      </div>
+    </div>
+    <div id="accueil-vedette" style="margin-top:20px"></div>
+  </section>
+
+  <!-- TOURNOIS -->
+  <section class="page" id="tournois">
+    <div class="page-head"><div class="eyebrow" data-i18n="to.eyebrow">Événements</div><h2 data-i18n="to.titre">Tournois</h2><p data-i18n="to.sous">Tous les tournois de la ligue — à venir, en cours et terminés.</p></div>
+    <div class="admin-panel admin-only">
+      <div class="lbl" data-i18n="to.adm">Admin · Nouveau tournoi</div>
+      <input id="to-nom" placeholder="Nom du tournoi (ex. Coupe d'ouverture)" data-i18n-ph="to.ph.nom">
+      <div class="deux-cols">
+        <input id="to-date" placeholder="Date (ex. 15 août 2026)" data-i18n-ph="to.ph.date">
+        <input id="to-poules" type="number" min="1" max="8" placeholder="Nombre de poules (ex. 2)" data-i18n-ph="to.ph.poules">
+      </div>
+      <textarea id="to-desc" placeholder="Description (optionnel)" data-i18n-ph="to.ph.desc"></textarea>
+      <button class="btn btn-cyan" onclick="ajouterTournoi()" data-i18n="to.creer">Créer le tournoi</button>
+    </div>
+    <div id="tournois-liste" class="grille g-auto"></div>
+  </section>
+
+  <!-- INSCRIPTIONS -->
+  <section class="page" id="inscriptions">
+    <div class="page-head"><div class="eyebrow" data-i18n="insc.eyebrow">Participer</div><h2 data-i18n="insc.titre">Inscriptions</h2><p data-i18n="insc.sous">Inscris-toi comme joueur — les équipes seront formées au repêchage.</p></div>
+    <div class="grille" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px" id="insc-wrap">
+      <div class="carte" style="text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:38px 28px">
+        <div style="font-size:44px;margin-bottom:8px">📝</div>
+        <h3 class="osw" style="font-size:24px;text-transform:uppercase;letter-spacing:.04em" data-i18n="insc.cta.titre">Inscription au repêchage</h3>
+        <p style="color:var(--argent);font-size:14.5px;margin:10px 0 22px;max-width:380px" data-i18n="insc.cta.texte">Remplis le formulaire pour t'inscrire comme joueur. Les DG te repêcheront pour bâtir leur équipe.</p>
+        <a class="btn btn-cyan" href="https://docs.google.com/forms/d/e/1FAIpQLSfB4BdJcgfUisVRU-oIbN9uWTSeO9AB5-RDhP_asshgBlz17A/viewform" target="_blank" rel="noopener" style="font-size:16px;padding:15px 34px" data-i18n="insc.cta.bouton">S'inscrire au tournoi →</a>
+        <div style="color:var(--argent2);font-size:12px;margin-top:14px" data-i18n="insc.cta.note">Le formulaire s'ouvre dans un nouvel onglet.</div>
+      </div>
+      <div class="carte" id="insc-info">
+        <h3 class="osw" style="font-size:18px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px" data-i18n="insc.how.titre">Le format · Repêchage</h3>
+        <div class="insc-etape"><span class="insc-num">1</span><span data-i18n="insc.how.1"><b>Inscris-toi comme joueur</b> — seul, pas en équipe.</span></div>
+        <div class="insc-etape"><span class="insc-num">2</span><span data-i18n="insc.how.2"><b>Les DG sont nommés</b> par le commissaire.</span></div>
+        <div class="insc-etape"><span class="insc-num">3</span><span data-i18n="insc.how.3"><b>Le repêchage</b> — les DG choisissent leurs joueurs à tour de rôle.</span></div>
+        <div class="insc-etape"><span class="insc-num">4</span><span data-i18n="insc.how.4"><b>Poules puis séries</b> — la route vers la Coupe commence. 🏆</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POULES -->
+  <section class="page" id="poules">
+    <div class="page-head"><div class="eyebrow" data-i18n="po.eyebrow">Tour préliminaire</div><h2 data-i18n="po.titre">Poules</h2><p data-i18n="po.sous">Le classement de chaque poule, calculé automatiquement.</p></div>
+    <div class="select-tournoi"><label data-i18n="commun.tournoi">Tournoi</label><select id="poules-select" onchange="changerTournoiActif(this.value)"></select></div>
+    <div class="admin-panel admin-only">
+      <div class="lbl" data-i18n="po.admEq">Admin · Ajouter une équipe au tournoi</div>
+      <div class="deux-cols">
+        <input id="eq-nom" placeholder="Nom de l'équipe" data-i18n-ph="po.ph.eq">
+        <input id="eq-couleur" type="color" value="#38C6E6" style="height:44px;padding:5px">
+      </div>
+      <div class="deux-cols">
+        <select id="eq-poule"></select>
+        <input id="eq-logo" placeholder="Lien logo (optionnel)" data-i18n-ph="po.ph.logo">
+      </div>
+      <button class="btn btn-cyan" onclick="ajouterEquipe()" data-i18n="po.ajEq">Ajouter l'équipe</button>
+      <div style="border-top:1px dashed var(--bordure-cyan);margin:16px 0"></div>
+      <div class="lbl" data-i18n="po.admMatch">Admin · Résultat de match de poule</div>
+      <div class="deux-cols">
+        <select id="mp-dom"></select>
+        <select id="mp-ext"></select>
+      </div>
+      <div class="deux-cols">
+        <input id="mp-sd" type="number" min="0" placeholder="Buts équipe 1" data-i18n-ph="po.ph.b1">
+        <input id="mp-se" type="number" min="0" placeholder="Buts équipe 2" data-i18n-ph="po.ph.b2">
+      </div>
+      <button class="btn btn-cyan" onclick="ajouterMatchPoule()" data-i18n="po.enrMatch">Enregistrer le match</button>
+    </div>
+    <div id="poules-contenu"></div>
+  </section>
+
+  <!-- BRACKET -->
+  <section class="page" id="bracket">
+    <div class="page-head"><div class="eyebrow" data-i18n="br.eyebrow">La route vers la Coupe</div><h2 data-i18n="br.titre">Éliminatoires</h2><p data-i18n="br.sous">Le tableau des séries. Le dernier debout soulève la Coupe.</p></div>
+    <div class="select-tournoi"><label data-i18n="commun.tournoi">Tournoi</label><select id="bracket-select" onchange="changerTournoiActif(this.value)"></select></div>
+    <div class="admin-panel admin-only">
+      <div class="lbl" data-i18n="br.adm">Admin · Ajouter un match de séries</div>
+      <div class="deux-cols">
+        <select id="mb-phase">
+          <option value="quart" data-i18n="br.quart">Quart de finale</option>
+          <option value="demi" data-i18n="br.demi">Demi-finale</option>
+          <option value="petite" data-i18n="br.petite">Petite finale (3e place)</option>
+          <option value="finale" data-i18n="br.finale">FINALE</option>
+        </select>
+        <div></div>
+      </div>
+      <div class="deux-cols">
+        <select id="mb-dom"></select>
+        <select id="mb-ext"></select>
+      </div>
+      <div class="deux-cols">
+        <input id="mb-sd" type="number" min="0" placeholder="Buts (vide = à jouer)" data-i18n-ph="br.ph.buts">
+        <input id="mb-se" type="number" min="0" placeholder="Buts (vide = à jouer)" data-i18n-ph="br.ph.buts">
+      </div>
+      <button class="btn btn-cyan" onclick="ajouterMatchBracket()" data-i18n="br.ajouter">Ajouter au tableau</button>
+    </div>
+    <div id="bracket-contenu"></div>
+  </section>
+
+  <!-- CHAMPIONS -->
+  <section class="page" id="champions">
+    <div class="page-head"><div class="eyebrow" data-i18n="ch.eyebrow">Temple de la renommée</div><h2 data-i18n="ch.titre">Champions</h2><p data-i18n="ch.sous">Les équipes qui ont soulevé la Coupe.</p></div>
+    <div id="champions-liste" class="grille g-auto"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="fnm">DYNASTY <small>TOURNOIS</small></div>
+  <div class="fl" data-i18n="foot.l1">Dynasty Hockey League · NHL 27 · World of Chel</div>
+  <div class="fl" style="margin-top:6px"><a href="https://dynastyhockeyleague.net" data-i18n="foot.retour">← Retour au site de la ligue</a></div>
+</footer>
+
+<!-- MODALE LOGIN -->
+<div class="modal" id="modale-login">
+  <div class="modal-box" style="max-width:360px">
+    <h3 data-i18n="login.titre">Mode admin</h3>
+    <input id="login-pass" type="password" placeholder="Mot de passe" data-i18n-ph="login.pass" onkeydown="if(event.key==='Enter')connexionAdmin()">
+    <div class="cta-row">
+      <button class="btn btn-cyan" onclick="connexionAdmin()" data-i18n="login.connexion">Connexion</button>
+      <button class="btn btn-ghost" onclick="fermerModale('modale-login')" data-i18n="commun.annuler">Annuler</button>
+    </div>
+    <div id="login-err" style="color:var(--rouge);font-size:13px;text-align:center;margin-top:10px;display:none" data-i18n="login.err">Mot de passe incorrect.</div>
+    <div id="login-out" class="admin-only" style="margin-top:14px;text-align:center">
+      <button class="del-btn" onclick="deconnexionAdmin()" data-i18n="login.dec">Se déconnecter</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* ===================== FIREBASE ===================== */
+const firebaseConfig = {
+  apiKey:"AIzaSyB2FMin3aA93x9OnEGfC0-UP3vkGFxee9c",
+  authDomain:"dynasty-chel.firebaseapp.com",
+  projectId:"dynasty-chel",
+  storageBucket:"dynasty-chel.firebasestorage.app",
+  messagingSenderId:"550460590216",
+  appId:"1:550460590216:web:1bb1626fb2e202364af73d"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const ADMIN_PASS = "tournoi2026";
+
+/* ===================== I18N ===================== */
+let langue = localStorage.getItem('t_langue') || 'fr';
+const DICT = {
+ fr:{
+  'nav.accueil':'Accueil','nav.tournois':'Tournois','nav.inscriptions':'Inscriptions','nav.poules':'Poules','nav.bracket':'Éliminatoires','nav.champions':'Champions',
+  'marque.sous':'TOURNOIS',
+  'hero.titre':'TOURNOIS','hero.sous':'Poules, éliminatoires et la route vers la Coupe. NHL 27 · World of Chel.','hero.cta1':'M\'inscrire','hero.cta2':'Voir les tournois',
+  'commun.tournoi':'Tournoi','commun.annuler':'Annuler','commun.fermer':'Fermer',
+  'vedette.eyebrow':'Tournoi en vedette','vedette.sinscrire':'S\'inscrire','vedette.poules':'Poules','vedette.bracket':'Éliminatoires',
+  'to.eyebrow':'Événements','to.titre':'Tournois','to.sous':'Tous les tournois de la ligue — à venir, en cours et terminés.','to.adm':'Admin · Nouveau tournoi','to.creer':'Créer le tournoi',
+  'to.ph.nom':'Nom du tournoi (ex. Coupe d\'ouverture)','to.ph.date':'Date (ex. 15 août 2026)','to.ph.poules':'Nombre de poules (ex. 2)','to.ph.desc':'Description (optionnel)',
+  'to.voirPoules':'Voir poules','to.voir':'Voir le tournoi','to.supprimer':'Supprimer','to.champion':'— Champion —',
+  'to.vide.t':'Aucun tournoi','to.vide.s':'Le premier tournoi arrive bientôt.',
+  'st.inscriptions':'Inscriptions ouvertes','st.poules':'Phase de poules','st.eliminatoires':'Éliminatoires','st.termine':'Terminé',
+  'meta.equipes':'équipes','meta.poules':'poule(s)','meta.avenir':'À venir','cup.champion':'Champion',
+  'insc.eyebrow':'Participer','insc.titre':'Inscriptions','insc.sous':'Inscris-toi comme joueur — les équipes seront formées au repêchage.',
+  'insc.cta.titre':'Inscription au repêchage','insc.cta.texte':'Remplis le formulaire pour t\'inscrire comme joueur. Les DG te repêcheront pour bâtir leur équipe.','insc.cta.bouton':'S\'inscrire au tournoi →','insc.cta.note':'Le formulaire s\'ouvre dans un nouvel onglet.',
+  'insc.how.titre':'Le format · Repêchage','insc.how.1':'<b>Inscris-toi comme joueur</b> — seul, pas en équipe.','insc.how.2':'<b>Les DG sont nommés</b> par le commissaire.','insc.how.3':'<b>Le repêchage</b> — les DG choisissent leurs joueurs à tour de rôle.','insc.how.4':'<b>Poules puis séries</b> — la route vers la Coupe commence. 🏆',
+  'po.eyebrow':'Tour préliminaire','po.titre':'Poules','po.sous':'Le classement de chaque poule, calculé automatiquement.',
+  'po.admEq':'Admin · Ajouter une équipe au tournoi','po.ajEq':'Ajouter l\'équipe','po.admMatch':'Admin · Résultat de match de poule','po.enrMatch':'Enregistrer le match',
+  'po.ph.eq':'Nom de l\'équipe','po.ph.logo':'Lien logo (optionnel)','po.ph.b1':'Buts équipe 1','po.ph.b2':'Buts équipe 2',
+  'po.poule':'Poule','po.tourNul':'Aucun tournoi','po.tourNul.s':'Crée un tournoi pour commencer.','po.eqVide':'Aucune équipe','po.eqVide.s':'Les équipes confirmées apparaîtront ici, réparties en poules.','po.3e':'Match pour la 3e place',
+  'col.eq':'Équipe','col.pj':'PJ','col.v':'V','col.d':'D','col.bp':'BP','col.bc':'BC','col.diff':'+/-','col.pts':'PTS',
+  'br.eyebrow':'La route vers la Coupe','br.titre':'Éliminatoires','br.sous':'Le tableau des séries. Le dernier debout soulève la Coupe.',
+  'br.adm':'Admin · Ajouter un match de séries','br.quart':'Quart de finale','br.demi':'Demi-finale','br.petite':'Petite finale (3e place)','br.finale':'FINALE','br.ajouter':'Ajouter au tableau','br.ph.buts':'Buts (vide = à jouer)',
+  'br.quarts':'Quarts de finale','br.demis':'Demi-finales','br.finaleT':'Finale','br.avenir':'À venir','br.acouronner':'À couronner',
+  'br.vide.t':'Les séries s\'en viennent','br.vide.s':'Une fois les poules terminées, le tableau des éliminatoires apparaîtra ici — la route vers la Coupe.',
+  'ch.eyebrow':'Temple de la renommée','ch.titre':'Champions','ch.sous':'Les équipes qui ont soulevé la Coupe.','ch.vide.t':'Aucun champion... pour l\'instant','ch.vide.s':'Le premier nom gravé sur la Coupe arrive bientôt.',
+  'foot.l1':'Dynasty Hockey League · NHL 27 · World of Chel','foot.retour':'← Retour au site de la ligue',
+  'login.titre':'Mode admin','login.pass':'Mot de passe','login.connexion':'Connexion','login.err':'Mot de passe incorrect.','login.dec':'Se déconnecter'
+ },
+ en:{
+  'nav.accueil':'Home','nav.tournois':'Tournaments','nav.inscriptions':'Register','nav.poules':'Groups','nav.bracket':'Playoffs','nav.champions':'Champions',
+  'marque.sous':'TOURNAMENTS',
+  'hero.titre':'TOURNAMENTS','hero.sous':'Groups, playoffs and the road to the Cup. NHL 27 · World of Chel.','hero.cta1':'Register','hero.cta2':'View tournaments',
+  'commun.tournoi':'Tournament','commun.annuler':'Cancel','commun.fermer':'Close',
+  'vedette.eyebrow':'Featured tournament','vedette.sinscrire':'Register','vedette.poules':'Groups','vedette.bracket':'Playoffs',
+  'to.eyebrow':'Events','to.titre':'Tournaments','to.sous':'All league tournaments — upcoming, ongoing and finished.','to.adm':'Admin · New tournament','to.creer':'Create tournament',
+  'to.ph.nom':'Tournament name (e.g. Opening Cup)','to.ph.date':'Date (e.g. Aug 15, 2026)','to.ph.poules':'Number of groups (e.g. 2)','to.ph.desc':'Description (optional)',
+  'to.voirPoules':'View groups','to.voir':'View tournament','to.supprimer':'Delete','to.champion':'— Champion —',
+  'to.vide.t':'No tournaments','to.vide.s':'The first tournament is coming soon.',
+  'st.inscriptions':'Registration open','st.poules':'Group stage','st.eliminatoires':'Playoffs','st.termine':'Finished',
+  'meta.equipes':'teams','meta.poules':'group(s)','meta.avenir':'TBD','cup.champion':'Champion',
+  'insc.eyebrow':'Take part','insc.titre':'Registration','insc.sous':'Register as a player — teams are formed through a draft.',
+  'insc.cta.titre':'Draft registration','insc.cta.texte':'Fill out the form to register as a player. GMs will draft you to build their team.','insc.cta.bouton':'Register for the tournament →','insc.cta.note':'The form opens in a new tab.',
+  'insc.how.titre':'The format · Draft','insc.how.1':'<b>Register as a player</b> — solo, not as a team.','insc.how.2':'<b>GMs are named</b> by the commissioner.','insc.how.3':'<b>The draft</b> — GMs pick their players in turns.','insc.how.4':'<b>Groups then playoffs</b> — the road to the Cup begins. 🏆',
+  'po.eyebrow':'Preliminary round','po.titre':'Groups','po.sous':'Each group\'s standings, calculated automatically.',
+  'po.admEq':'Admin · Add a team to the tournament','po.ajEq':'Add team','po.admMatch':'Admin · Group match result','po.enrMatch':'Save match',
+  'po.ph.eq':'Team name','po.ph.logo':'Logo link (optional)','po.ph.b1':'Team 1 goals','po.ph.b2':'Team 2 goals',
+  'po.poule':'Group','po.tourNul':'No tournament','po.tourNul.s':'Create a tournament to get started.','po.eqVide':'No teams','po.eqVide.s':'Confirmed teams will appear here, split into groups.','po.3e':'Third-place match',
+  'col.eq':'Team','col.pj':'GP','col.v':'W','col.d':'L','col.bp':'GF','col.bc':'GA','col.diff':'+/-','col.pts':'PTS',
+  'br.eyebrow':'The road to the Cup','br.titre':'Playoffs','br.sous':'The playoff bracket. The last one standing lifts the Cup.',
+  'br.adm':'Admin · Add a playoff match','br.quart':'Quarter-final','br.demi':'Semi-final','br.petite':'Third-place game','br.finale':'FINAL','br.ajouter':'Add to bracket','br.ph.buts':'Goals (empty = to play)',
+  'br.quarts':'Quarter-finals','br.demis':'Semi-finals','br.finaleT':'Final','br.avenir':'TBD','br.acouronner':'To be crowned',
+  'br.vide.t':'Playoffs coming soon','br.vide.s':'Once the group stage ends, the playoff bracket will appear here — the road to the Cup.',
+  'ch.eyebrow':'Hall of fame','ch.titre':'Champions','ch.sous':'The teams that lifted the Cup.','ch.vide.t':'No champions... yet','ch.vide.s':'The first name on the Cup is coming soon.',
+  'foot.l1':'Dynasty Hockey League · NHL 27 · World of Chel','foot.retour':'← Back to the league site',
+  'login.titre':'Admin mode','login.pass':'Password','login.connexion':'Log in','login.err':'Wrong password.','login.dec':'Log out'
+ }
+};
+function T(cle){ return (DICT[langue] && DICT[langue][cle]) || (DICT.fr[cle]) || cle; }
+function appliquerLangue(){
+  document.documentElement.lang = langue;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ const k=el.getAttribute('data-i18n'); const v=T(k); if(v) el.innerHTML=v; });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ const k=el.getAttribute('data-i18n-ph'); const v=T(k); if(v) el.setAttribute('placeholder', v); });
+  const lb=document.getElementById('lang-btn'); if(lb) lb.textContent = (langue==='fr'?'EN':'FR');
+  const ms=document.querySelector('.brand .nm small'); if(ms) ms.textContent = T('marque.sous');
+  const fs=document.querySelector('footer .fnm small'); if(fs) fs.textContent = T('marque.sous');
+}
+function basculerLangue(){ langue = (langue==='fr'?'en':'fr'); localStorage.setItem('t_langue', langue); appliquerLangue(); rafraichir(); }
+
+
+/* ===================== ÉTAT ===================== */
+let estAdmin = false;
+let tournoiActif = null;              // id du tournoi sélectionné
+let snapTournois=null, snapEquipes=null, snapMatchs=null, snapInsc=null;
+
+/* ===================== ADMIN ===================== */
+function ouvrirLogin(){ document.getElementById('modale-login').classList.add('open'); document.getElementById('login-err').style.display='none'; }
+function connexionAdmin(){
+  const p = document.getElementById('login-pass').value;
+  if(p === ADMIN_PASS){
+    estAdmin = true; sessionStorage.setItem('t_admin','1'); appliquerRoles();
+    fermerModale('modale-login'); document.getElementById('login-pass').value='';
+  } else { document.getElementById('login-err').style.display='block'; }
+}
+function deconnexionAdmin(){ estAdmin=false; sessionStorage.removeItem('t_admin'); appliquerRoles(); fermerModale('modale-login'); }
+function appliquerRoles(){ document.body.classList.toggle('is-admin', estAdmin); rafraichir(); }
+function fermerModale(id){ document.getElementById(id).classList.remove('open'); }
+
+/* ===================== ROUTEUR ===================== */
+const ROUTES=['accueil','tournois','inscriptions','poules','bracket','champions'];
+function afficherRoute(){
+  let h=(location.hash||'#accueil').slice(1);
+  if(!ROUTES.includes(h)) h='accueil';
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('actif', p.id===h));
+  document.querySelectorAll('.nav-link').forEach(a=>a.classList.toggle('actif', a.dataset.route===h));
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange', afficherRoute);
+
+/* ===================== HELPERS ===================== */
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function equipesDuTournoi(tid){ const a=[]; if(snapEquipes) snapEquipes.forEach(d=>{const e=d.data(); if(e.tournoiId===tid) a.push({id:d.id,...e});}); return a; }
+function matchsDuTournoi(tid){ const a=[]; if(snapMatchs) snapMatchs.forEach(d=>{const m=d.data(); if(m.tournoiId===tid) a.push({id:d.id,...m});}); return a; }
+function tournoiParId(id){ let r=null; if(snapTournois) snapTournois.forEach(d=>{if(d.id===id) r={id:d.id,...d.data()};}); return r; }
+function eqParId(list,id){ return list.find(e=>e.id===id)||null; }
+function lettresPoules(n){ return Array.from({length:n||0},(_,i)=>String.fromCharCode(65+i)); }
+const LIBELLE_STATUT={inscriptions:'Inscriptions ouvertes',poules:'Phase de poules',eliminatoires:'Éliminatoires',termine:'Terminé'};
+
+function nomStatut(s){ return T('st.'+s); }
+
+/* ===================== INIT / SNAPSHOTS ===================== */
+function init(){
+  db.collection('tournois').orderBy('createdAt','desc').onSnapshot(s=>{snapTournois=s; rafraichir();}, e=>console.warn(e));
+  db.collection('tEquipes').onSnapshot(s=>{snapEquipes=s; rafraichir();}, e=>console.warn(e));
+  db.collection('tMatchs').onSnapshot(s=>{snapMatchs=s; rafraichir();}, e=>console.warn(e));
+  db.collection('tInscriptions').orderBy('createdAt','desc').onSnapshot(s=>{snapInsc=s; rafraichir();}, e=>console.warn(e));
+}
+
+function rafraichir(){
+  if(!snapTournois) return;
+  // choisir un tournoi actif par défaut (le plus récent non terminé, sinon le plus récent)
+  if(!tournoiActif || !tournoiParId(tournoiActif)){
+    let choix=null, premier=null;
+    snapTournois.forEach(d=>{ const t=d.data(); if(!premier) premier=d.id; if(!choix && t.statut!=='termine') choix=d.id; });
+    tournoiActif = choix || premier;
+  }
+  rendreTournois(); rendreVedette(); rendreSelects(); rendrePoules(); rendreBracket(); rendreChampions(); rendreInscriptionsAdmin(); rendreSelectInscription();
+}
+
+/* ===================== TOURNOIS ===================== */
+function ajouterTournoi(){
+  const nom=document.getElementById('to-nom').value.trim();
+  const date=document.getElementById('to-date').value.trim();
+  const nbPoules=parseInt(document.getElementById('to-poules').value)||1;
+  const description=document.getElementById('to-desc').value.trim();
+  if(!nom){ alerT('Donne un nom au tournoi.'); return; }
+  db.collection('tournois').add({nom,date,nbPoules,description,statut:'inscriptions',champion:null,createdAt:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(()=>{ ['to-nom','to-date','to-poules','to-desc'].forEach(i=>document.getElementById(i).value=''); })
+    .catch(e=>alerT('Erreur : '+e.message));
+}
+function changerStatut(id, statut){ db.collection('tournois').doc(id).update({statut}).catch(e=>alert(e.message)); }
+function definirChampion(id, eqId){ db.collection('tournois').doc(id).update({champion:eqId, statut:'termine'}).catch(e=>alert(e.message)); }
+function supprimerTournoi(id){
+  if(!confirm('Supprimer ce tournoi ? (les équipes et matchs liés resteront à nettoyer)')) return;
+  db.collection('tournois').doc(id).delete().catch(e=>alert(e.message));
+}
+function rendreTournois(){
+  const c=document.getElementById('tournois-liste'); if(!c) return;
+  if(snapTournois.empty){ c.innerHTML=videHTML('🏒',T('to.vide.t'),T('to.vide.s')); return; }
+  let html='';
+  snapTournois.forEach(d=>{
+    const t=d.data(); const eqs=equipesDuTournoi(d.id);
+    const champ = t.champion ? eqParId(eqs,t.champion) : null;
+    html+='<div class="carte t-carte'+(champ?' champ':'')+'">'
+      +'<div style="display:flex;justify-content:space-between;align-items:start;gap:10px">'
+        +'<h3>'+esc(t.nom)+'</h3>'
+        +'<span class="statut st-'+t.statut+'">'+nomStatut(t.statut)+'</span>'
+      +'</div>'
+      + (t.description?'<p style="color:var(--argent);font-size:13.5px;margin-top:6px">'+esc(t.description)+'</p>':'')
+      +'<div class="barre"></div>'
+      +'<div class="meta"><span>📅 <b>'+esc(t.date||T('meta.avenir'))+'</b></span><span>🛡️ <b>'+eqs.length+'</b> '+T('meta.equipes')+'</span><span>🎯 <b>'+(t.nbPoules||1)+'</b> '+T('meta.poules')+'</span></div>'
+      + (champ?'<div class="cup">🏆 '+T('cup.champion')+' : '+esc(champ.nom)+'</div>':'');
+    if(estAdmin){
+      html+='<div class="ic-actions">'
+        +selStatut(d.id,t.statut)
+        +'<button class="btn-mini" onclick="voirTournoi(\''+d.id+'\')">'+T('to.voirPoules')+'</button>'
+        + (t.statut==='eliminatoires'||t.statut==='termine' ? btnChampion(d.id,eqs) : '')
+        +'<button class="del-btn" onclick="supprimerTournoi(\''+d.id+'\')">'+T('to.supprimer')+'</button>'
+      +'</div>';
+    } else {
+      html+='<div class="ic-actions"><button class="btn-mini" onclick="voirTournoi(\''+d.id+'\')">'+T('to.voir')+'</button></div>';
+    }
+    html+='</div>';
+  });
+  c.innerHTML=html;
+}
+function selStatut(id, cur){
+  const opts=['inscriptions','poules','eliminatoires','termine'].map(s=>'<option value="'+s+'"'+(s===cur?' selected':'')+'>'+nomStatut(s)+'</option>').join('');
+  return '<select style="width:auto;margin:0;padding:6px 10px;font-size:12px" onchange="changerStatut(\''+id+'\',this.value)">'+opts+'</select>';
+}
+function btnChampion(id, eqs){
+  if(!eqs.length) return '';
+  const opts='<option value="">'+T('to.champion')+'</option>'+eqs.map(e=>'<option value="'+e.id+'">'+esc(e.nom)+'</option>').join('');
+  return '<select style="width:auto;margin:0;padding:6px 10px;font-size:12px" onchange="if(this.value)definirChampion(\''+id+'\',this.value)">'+opts+'</select>';
+}
+function voirTournoi(id){ tournoiActif=id; location.hash='#poules'; rafraichir(); }
+
+function videHTML(ico,t,s){ return '<div class="vide" style="grid-column:1/-1"><div class="ico">'+ico+'</div><b>'+t+'</b><span>'+s+'</span></div>'; }
+
+/* ===================== VEDETTE (accueil) ===================== */
+function rendreVedette(){
+  const c=document.getElementById('accueil-vedette'); if(!c) return;
+  const t=tournoiParId(tournoiActif);
+  if(!t){ c.innerHTML=''; return; }
+  const eqs=equipesDuTournoi(t.id);
+  const champ=t.champion?eqParId(eqs,t.champion):null;
+  c.innerHTML='<div class="carte t-carte'+(champ?' champ':'')+'" style="max-width:640px;margin:0 auto">'
+    +'<div class="eyebrow">'+T('vedette.eyebrow')+'</div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:6px">'
+      +'<h3 style="font-size:26px">'+esc(t.nom)+'</h3>'
+      +'<span class="statut st-'+t.statut+'">'+nomStatut(t.statut)+'</span></div>'
+    +'<div class="barre"></div>'
+    +'<div class="meta"><span>📅 <b>'+esc(t.date||T('meta.avenir'))+'</b></span><span>🛡️ <b>'+eqs.length+'</b> '+T('meta.equipes')+'</span></div>'
+    + (champ?'<div class="cup">🏆 '+T('cup.champion')+' : '+esc(champ.nom)+'</div>':'')
+    +'<div class="ic-actions">'
+      + (t.statut==='inscriptions'?'<a class="btn-mini ok" href="#inscriptions">'+T('vedette.sinscrire')+'</a>':'')
+      +'<a class="btn-mini" href="#poules" onclick="tournoiActif=\''+t.id+'\'">'+T('vedette.poules')+'</a>'
+      +'<a class="btn-mini" href="#bracket" onclick="tournoiActif=\''+t.id+'\'">'+T('vedette.bracket')+'</a>'
+    +'</div></div>';
+}
+
+/* ===================== SELECTS (poules/bracket + admin) ===================== */
+function rendreSelects(){
+  ['poules-select','bracket-select'].forEach(id=>{
+    const s=document.getElementById(id); if(!s) return;
+    let html='';
+    snapTournois.forEach(d=>{ const t=d.data(); html+='<option value="'+d.id+'"'+(d.id===tournoiActif?' selected':'')+'>'+esc(t.nom)+'</option>'; });
+    s.innerHTML=html||'<option>Aucun tournoi</option>';
+  });
+  // poule select (admin ajout équipe)
+  const t=tournoiParId(tournoiActif);
+  const ep=document.getElementById('eq-poule');
+  if(ep && t){ ep.innerHTML=lettresPoules(t.nbPoules).map(l=>'<option value="'+l+'">Poule '+l+'</option>').join(''); }
+  // selects de match (poule + bracket) avec équipes du tournoi
+  const eqs=t?equipesDuTournoi(t.id):[];
+  const opt='<option value="">— équipe —</option>'+eqs.map(e=>'<option value="'+e.id+'">'+esc(e.nom)+'</option>').join('');
+  ['mp-dom','mp-ext','mb-dom','mb-ext'].forEach(id=>{ const s=document.getElementById(id); if(s) s.innerHTML=opt; });
+}
+function changerTournoiActif(id){ tournoiActif=id; rafraichir(); }
+
+/* ===================== ÉQUIPES ===================== */
+function ajouterEquipe(){
+  const t=tournoiParId(tournoiActif); if(!t){ alerT('Choisis un tournoi.'); return; }
+  const nom=document.getElementById('eq-nom').value.trim();
+  const couleur=document.getElementById('eq-couleur').value;
+  const poule=document.getElementById('eq-poule').value||'A';
+  const logo=document.getElementById('eq-logo').value.trim();
+  if(!nom){ alerT('Nom de l\'équipe requis.'); return; }
+  db.collection('tEquipes').add({tournoiId:t.id,nom,couleur,poule,logo,createdAt:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(()=>{ document.getElementById('eq-nom').value=''; document.getElementById('eq-logo').value=''; })
+    .catch(e=>alert(e.message));
+}
+function supprimerEquipe(id){ if(confirm('Retirer cette équipe ?')) db.collection('tEquipes').doc(id).delete().catch(e=>alert(e.message)); }
+
+/* ===================== MATCHS DE POULE ===================== */
+function ajouterMatchPoule(){
+  const t=tournoiParId(tournoiActif); if(!t) return;
+  const domId=document.getElementById('mp-dom').value, extId=document.getElementById('mp-ext').value;
+  const sd=parseInt(document.getElementById('mp-sd').value), se=parseInt(document.getElementById('mp-se').value);
+  if(!domId||!extId||domId===extId){ alerT('Choisis deux équipes différentes.'); return; }
+  if(isNaN(sd)||isNaN(se)){ alerT('Entre les deux scores.'); return; }
+  const eqs=equipesDuTournoi(t.id); const dom=eqParId(eqs,domId), ext=eqParId(eqs,extId);
+  db.collection('tMatchs').add({tournoiId:t.id,phase:'poule',poule:dom.poule||'A',
+    domId,domNom:dom.nom,extId,extNom:ext.nom,scoreDom:sd,scoreExt:se,joue:true,
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(()=>{ document.getElementById('mp-sd').value=''; document.getElementById('mp-se').value=''; })
+    .catch(e=>alert(e.message));
+}
+function supprimerMatch(id){ if(confirm('Supprimer ce match ?')) db.collection('tMatchs').doc(id).delete().catch(e=>alert(e.message)); }
+
+/* Classement d'une poule */
+function classementPoule(tid, poule, eqs){
+  const st={};
+  eqs.filter(e=>(e.poule||'A')===poule).forEach(e=>{ st[e.id]={id:e.id,nom:e.nom,couleur:e.couleur,pj:0,v:0,d:0,bp:0,bc:0,pts:0}; });
+  matchsDuTournoi(tid).filter(m=>m.phase==='poule' && m.joue && (m.poule||'A')===poule).forEach(m=>{
+    const a=st[m.domId], b=st[m.extId]; if(!a||!b) return;
+    a.pj++; b.pj++; a.bp+=+m.scoreDom; a.bc+=+m.scoreExt; b.bp+=+m.scoreExt; b.bc+=+m.scoreDom;
+    if(+m.scoreDom>+m.scoreExt){ a.v++; a.pts+=2; b.d++; } else if(+m.scoreExt>+m.scoreDom){ b.v++; b.pts+=2; a.d++; } else { a.pts++; b.pts++; }
+  });
+  return Object.values(st).sort((x,y)=> y.pts-x.pts || (y.bp-y.bc)-(x.bp-x.bc) || y.bp-x.bp || x.nom.localeCompare(y.nom));
+}
+
+function rendrePoules(){
+  const c=document.getElementById('poules-contenu'); if(!c) return;
+  const t=tournoiParId(tournoiActif);
+  if(!t){ c.innerHTML=videHTML('🏒',T('po.tourNul'),T('po.tourNul.s')); return; }
+  const eqs=equipesDuTournoi(t.id);
+  if(eqs.length===0){ c.innerHTML=videHTML('🛡️',T('po.eqVide'),T('po.eqVide.s')); return; }
+  let html='';
+  lettresPoules(t.nbPoules).forEach(L=>{
+    const cl=classementPoule(t.id,L,eqs);
+    if(cl.length===0) return;
+    html+='<div class="pool-titre">'+T('po.poule')+' '+L+'</div>';
+    html+='<div class="tbl-wrap"><table><thead><tr><th class="rang">#</th><th class="eq">'+T('col.eq')+'</th><th>'+T('col.pj')+'</th><th>'+T('col.v')+'</th><th>'+T('col.d')+'</th><th>'+T('col.bp')+'</th><th>'+T('col.bc')+'</th><th>'+T('col.diff')+'</th><th>'+T('col.pts')+'</th></tr></thead><tbody>';
+    cl.forEach((s,i)=>{
+      const q = i<2; // top 2 qualifiés (indicatif)
+      html+='<tr class="'+(q?'q':'')+'"><td class="rang">'+(i+1)+'</td>'
+        +'<td class="eq"><span class="pastille" style="background:'+(s.couleur||'#38C6E6')+'"></span>'+esc(s.nom)+'</td>'
+        +'<td>'+s.pj+'</td><td>'+s.v+'</td><td>'+s.d+'</td><td>'+s.bp+'</td><td>'+s.bc+'</td><td>'+((s.bp-s.bc>0?'+':'')+(s.bp-s.bc))+'</td><td class="pts">'+s.pts+'</td></tr>';
+    });
+    html+='</tbody></table></div>';
+    // matchs de la poule
+    const ms=matchsDuTournoi(t.id).filter(m=>m.phase==='poule'&&(m.poule||'A')===L);
+    if(ms.length){
+      html+='<div style="margin:12px 0 22px">';
+      ms.forEach(m=>{
+        const dg=+m.scoreDom>+m.scoreExt, eg=+m.scoreExt>+m.scoreDom;
+        html+='<div class="match-l"><div class="e d"><span class="'+(dg?'gagne':'')+'">'+esc(m.domNom)+'</span></div>'
+          +'<div class="sc"><span class="'+(dg?'gagne':'')+'">'+m.scoreDom+'</span><small>–</small><span class="'+(eg?'gagne':'')+'">'+m.scoreExt+'</span></div>'
+          +'<div class="e"><span class="'+(eg?'gagne':'')+'">'+esc(m.extNom)+'</span></div>'
+          + (estAdmin?'<button class="del-btn admin-only inline" style="flex:none" onclick="supprimerMatch(\''+m.id+'\')">✕</button>':'')
+          +'</div>';
+      });
+      html+='</div>';
+    }
+    // liste admin des équipes (pour supprimer)
+    if(estAdmin){
+      const dansL=eqs.filter(e=>(e.poule||'A')===L);
+      html+='<div class="admin-only" style="margin:-8px 0 20px;display:flex;gap:8px;flex-wrap:wrap">'
+        +dansL.map(e=>'<span style="font-size:12px;color:var(--argent);border:1px solid var(--bordure);border-radius:99px;padding:4px 10px">'+esc(e.nom)+' <a onclick="supprimerEquipe(\''+e.id+'\')" style="color:var(--rouge);cursor:pointer">✕</a></span>').join('')
+        +'</div>';
+    }
+  });
+  c.innerHTML=html||videHTML('🛡️',T('po.eqVide'),T('po.eqVide.s'));
+}
+
+/* ===================== BRACKET ===================== */
+function ajouterMatchBracket(){
+  const t=tournoiParId(tournoiActif); if(!t) return;
+  const phase=document.getElementById('mb-phase').value;
+  const domId=document.getElementById('mb-dom').value, extId=document.getElementById('mb-ext').value;
+  if(!domId||!extId||domId===extId){ alerT('Choisis deux équipes différentes.'); return; }
+  const sdv=document.getElementById('mb-sd').value, sev=document.getElementById('mb-se').value;
+  const sd=sdv===''?null:parseInt(sdv), se=sev===''?null:parseInt(sev);
+  const joue = sd!==null && se!==null;
+  const eqs=equipesDuTournoi(t.id); const dom=eqParId(eqs,domId), ext=eqParId(eqs,extId);
+  db.collection('tMatchs').add({tournoiId:t.id,phase,domId,domNom:dom.nom,extId,extNom:ext.nom,
+    scoreDom:sd,scoreExt:se,joue,createdAt:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(()=>{ document.getElementById('mb-sd').value=''; document.getElementById('mb-se').value=''; })
+    .catch(e=>alert(e.message));
+}
+function rendreBracket(){
+  const c=document.getElementById('bracket-contenu'); if(!c) return;
+  const t=tournoiParId(tournoiActif);
+  if(!t){ c.innerHTML=videHTML('🏆',T('po.tourNul'),''); return; }
+  const ms=matchsDuTournoi(t.id);
+  const phases=[['quart',T('br.quarts')],['demi',T('br.demis')],['finale',T('br.finaleT')]];
+  const aDesSeries = ms.some(m=>['quart','demi','finale','petite'].includes(m.phase));
+  if(!aDesSeries){ c.innerHTML=videHTML('🏆',T('br.vide.t'),T('br.vide.s')); return; }
+  let html='<div class="bracket">';
+  phases.forEach(([ph,titre],idx)=>{
+    const list=ms.filter(m=>m.phase===ph);
+    html+='<div class="col-ph'+(ph==='finale'?' finale':'')+'"><div class="ph-titre">'+titre+'</div>';
+    if(list.length===0){ html+='<div style="color:var(--argent2);font-size:12px;text-align:center;padding:20px 0">'+T('br.avenir')+'</div>'; }
+    list.forEach(m=>html+=brMatchHTML(m));
+    html+='</div>';
+  });
+  // champion box
+  const finale=ms.find(m=>m.phase==='finale'&&m.joue);
+  let champNom=null;
+  if(finale){ champNom = (+finale.scoreDom>+finale.scoreExt)?finale.domNom:finale.extNom; }
+  if(t.champion){ const ce=eqParId(equipesDuTournoi(t.id),t.champion); if(ce) champNom=ce.nom; }
+  html+='<div class="champion-box"><div class="cup-ico">🏆</div><div class="lbl">'+T('cup.champion')+'</div>'
+    + (champNom?'<div class="nm">'+esc(champNom)+'</div>':'<div class="attente">'+T('br.acouronner')+'</div>')+'</div>';
+  html+='</div>';
+  // petite finale
+  const petite=ms.filter(m=>m.phase==='petite');
+  if(petite.length){
+    html+='<div class="pool-titre" style="margin-top:26px">'+T('po.3e')+'</div>';
+    petite.forEach(m=>html+='<div style="max-width:300px">'+brMatchHTML(m)+'</div>');
+  }
+  c.innerHTML=html;
+}
+function brMatchHTML(m){
+  const joue=m.joue;
+  const dg=joue&&+m.scoreDom>+m.scoreExt, eg=joue&&+m.scoreExt>+m.scoreDom;
+  return '<div class="br-match">'
+    +'<div class="br-team'+(dg?' win':'')+'"><span class="nm">'+esc(m.domNom)+'</span><span class="s">'+(joue?m.scoreDom:'–')+'</span></div>'
+    +'<div class="br-team'+(eg?' win':'')+'"><span class="nm">'+esc(m.extNom)+'</span><span class="s">'+(joue?m.scoreExt:'–')+'</span></div>'
+    + (estAdmin?'<div class="admin-only" style="padding:6px 10px;border-top:1px solid var(--bordure);text-align:right"><button class="del-btn" onclick="supprimerMatch(\''+m.id+'\')">Supprimer</button></div>':'')
+    +'</div>';
+}
+
+/* ===================== INSCRIPTIONS ===================== */
+function rendreSelectInscription(){
+  const s=document.getElementById('in-tournoi'); if(!s) return;
+  const ouverts=[]; if(snapTournois) snapTournois.forEach(d=>{ const t=d.data(); if(t.statut==='inscriptions') ouverts.push({id:d.id,nom:t.nom}); });
+  if(ouverts.length===0){ s.innerHTML='<option value="">Aucun tournoi ouvert</option>'; }
+  else s.innerHTML=ouverts.map(t=>'<option value="'+t.id+'">'+esc(t.nom)+'</option>').join('');
+}
+function envoyerInscription(){
+  const tournoiId=document.getElementById('in-tournoi').value;
+  const nomEquipe=document.getElementById('in-equipe').value.trim();
+  const capitaine=document.getElementById('in-cap').value.trim();
+  const plateforme=document.getElementById('in-plat').value;
+  const discord=document.getElementById('in-discord').value.trim();
+  if(!tournoiId){ alerT('Aucun tournoi ouvert aux inscriptions.'); return; }
+  if(!nomEquipe||!capitaine){ alerT('Nom d\'équipe et capitaine requis.'); return; }
+  db.collection('tInscriptions').add({tournoiId,nomEquipe,capitaine,plateforme,discord,statut:'nouveau',createdAt:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(()=>{
+      ['in-equipe','in-cap','in-discord'].forEach(i=>document.getElementById(i).value='');
+      const m=document.getElementById('insc-merci'); m.textContent='✅ Inscription envoyée! Le commissaire va confirmer ton équipe.'; m.style.display='block';
+      setTimeout(()=>m.style.display='none',5000);
+    }).catch(e=>alert(e.message));
+}
+function rendreInscriptionsAdmin(){
+  const c=document.getElementById('insc-admin'); if(!c) return;
+  if(!snapInsc||snapInsc.empty){ c.innerHTML='<p style="color:var(--argent);font-size:13px">Aucune inscription pour le moment.</p>'; return; }
+  let html='';
+  snapInsc.forEach(d=>{
+    const i=d.data(); const t=tournoiParId(i.tournoiId);
+    html+='<div style="border:1px solid var(--bordure);border-radius:10px;padding:11px;margin-bottom:8px">'
+      +'<div style="font-weight:700">'+esc(i.nomEquipe)+' <span style="color:var(--argent);font-weight:400;font-size:12px">· '+esc((t&&t.nom)||'?')+'</span></div>'
+      +'<div style="color:var(--argent);font-size:12.5px;margin-top:2px">👤 '+esc(i.capitaine)+' · '+esc(i.plateforme)+(i.discord?' · '+esc(i.discord):'')+'</div>'
+      +'<div class="ic-actions" style="margin-top:8px">'
+        +'<button class="btn-mini ok" onclick="confirmerInscription(\''+d.id+'\')">✔ Confirmer (créer l\'équipe)</button>'
+        +'<button class="del-btn" onclick="supprimerInscription(\''+d.id+'\')">Supprimer</button>'
+      +'</div></div>';
+  });
+  c.innerHTML=html;
+}
+function confirmerInscription(id){
+  let insc=null; snapInsc.forEach(d=>{ if(d.id===id) insc={id:d.id,...d.data()}; });
+  if(!insc) return;
+  const t=tournoiParId(insc.tournoiId);
+  const poule = lettresPoules(t?t.nbPoules:1)[0]||'A';
+  db.collection('tEquipes').add({tournoiId:insc.tournoiId,nom:insc.nomEquipe,couleur:'#38C6E6',poule,logo:'',
+    capitaine:insc.capitaine,createdAt:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(()=>db.collection('tInscriptions').doc(id).update({statut:'confirme'}))
+    .then(()=>alerT('Équipe créée dans la poule '+poule+'. Tu peux la déplacer/éditer dans Poules.'))
+    .catch(e=>alert(e.message));
+}
+function supprimerInscription(id){ if(confirm('Supprimer cette inscription ?')) db.collection('tInscriptions').doc(id).delete().catch(e=>alert(e.message)); }
+
+/* ===================== CHAMPIONS ===================== */
+function rendreChampions(){
+  const c=document.getElementById('champions-liste'); if(!c) return;
+  const termines=[]; snapTournois.forEach(d=>{ const t=d.data(); if(t.statut==='termine'&&t.champion) termines.push({id:d.id,...t}); });
+  if(termines.length===0){ c.innerHTML=videHTML('🏆',T('ch.vide.t'),T('ch.vide.s')); return; }
+  let html='';
+  termines.forEach(t=>{ const ch=eqParId(equipesDuTournoi(t.id),t.champion);
+    html+='<div class="carte champ-carte"><div class="cup">🏆</div><div class="t-nom">'+esc(t.nom)+'</div>'
+      +'<div class="gagnant">'+esc(ch?ch.nom:'?')+'</div><div class="an">'+esc(t.date||'')+'</div></div>';
+  });
+  c.innerHTML=html;
+}
+
+/* ===================== DÉMARRAGE ===================== */
+if(sessionStorage.getItem('t_admin')==='1'){ estAdmin=true; document.body.classList.add('is-admin'); }
+appliquerLangue();
+afficherRoute();
+init();
+</script>
+</body>
+</html>
