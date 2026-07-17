@@ -156,6 +156,11 @@ tr.q td.eq::after{content:' ✓';color:var(--vert);font-size:11px}
 .match-l .sc small{color:var(--argent2);font-size:16px;margin:0 3px}
 .match-l .gagne{color:var(--cyan);font-weight:700}
 .match-l.avenir .sc{color:var(--argent2);font-size:14px;font-family:'Oswald',sans-serif}
+.cal-no{flex:none;width:24px;height:24px;border-radius:50%;background:rgba(56,198,230,.1);color:var(--cyan);
+  font-family:'Bebas Neue',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center}
+.cal-heure{flex:none;font-size:11.5px;font-weight:600;color:var(--argent);letter-spacing:.03em;
+  background:rgba(120,160,190,.08);border:1px solid var(--bordure);border-radius:99px;padding:3px 9px;white-space:nowrap}
+@media(max-width:560px){.cal-heure{display:none}}
 
 /* ---------- Bracket ---------- */
 .bracket{display:flex;gap:34px;overflow-x:auto;padding:8px 4px 20px}
@@ -408,6 +413,7 @@ footer a{color:var(--cyan);text-decoration:none}
         <select id="cal-dom"></select>
         <select id="cal-ext"></select>
       </div>
+      <input id="cal-heure" placeholder="Heure (ex. 20h00) — optionnel" data-i18n-ph="cal.ph.heure">
       <button class="btn btn-cyan" onclick="ajouterAuCalendrier()" data-i18n="cal.ajouter">Ajouter au calendrier</button>
     </div>
     <div id="calendrier-contenu"></div>
@@ -537,7 +543,7 @@ const DICT = {
   'ea.adm':'Admin · Import EA (matchs privés de club)','ea.admNote':'Va chercher les derniers matchs privés d\'une équipe qui a un ID club EA. Relie les joueurs par gamertag.','ea.btn':'📥 Importer depuis EA','ea.titre':'Importer depuis EA','ea.choisir':'Choisis une équipe (qui a un ID club EA) pour aller chercher ses derniers matchs privés de club.','ea.equipe':'Équipe à importer','ea.chercher':'Chercher les matchs','ea.confirmer':'Importer les matchs cochés',
   'ea.aucunClub':'Aucune équipe n\'a d\'ID club EA. Ajoute-le dans la fiche de l\'équipe.','ea.chargement':'Connexion à EA… (10-20 sec)','ea.erreur':'Erreur de connexion à EA. Réessaie dans quelques minutes.','ea.matchsTrouves':'match(s) trouvé(s)','ea.pretsImport':'prêt(s) à importer','ea.horsLigue':'adversaire hors-tournoi','ea.nul':'égalité (ignoré)','ea.deja':'déjà importé','ea.nonRelies':'joueur(s) non reliés','ea.nouveaux':'nouveaux joueurs','ea.importEnCours':'Import en cours…','ea.rienCoche':'Coche au moins un match.','ea.fini':'{n} match(s) importé(s)! Les stats sont à jour.','ea.finiPlus':'{n} match(s) importé(s) · {j} joueur(s) créé(s)! Les stats sont à jour.',
   'me.titre':'Meilleurs pointeurs','me.joueur':'Joueur','me.equipe':'Équipe','me.b':'B','me.a':'A',
-  'nav.calendrier':'Calendrier','cal.eyebrow':'Horaire','cal.titre':'Calendrier','cal.sous':'Qui joue contre qui. Les scores s\'affichent une fois les matchs joués.','cal.adm':'Admin · Ajouter un match à l\'horaire','cal.admNote':'Crée les affrontements prévus. Ils se remplissent avec le score quand tu entres/importes le résultat.','cal.ajouter':'Ajouter au calendrier','cal.vide.t':'Horaire à venir','cal.vide.s':'Les affrontements prévus apparaîtront ici.',
+  'nav.calendrier':'Calendrier','cal.eyebrow':'Horaire','cal.titre':'Calendrier','cal.sous':'Qui joue contre qui. Les scores s\'affichent une fois les matchs joués.','cal.adm':'Admin · Ajouter un match à l\'horaire','cal.admNote':'Crée les affrontements prévus. Ils se remplissent avec le score quand tu entres/importes le résultat.','cal.ajouter':'Ajouter au calendrier','cal.ph.heure':'Heure (ex. 20h00) — optionnel','cal.vide.t':'Horaire à venir','cal.vide.s':'Les affrontements prévus apparaîtront ici.',
   'po.poule':'Poule','po.tourNul':'Aucun tournoi','po.tourNul.s':'Crée un tournoi pour commencer.','po.eqVide':'Aucune équipe','po.eqVide.s':'Les équipes confirmées apparaîtront ici, réparties en poules.','po.3e':'Match pour la 3e place',
   'col.eq':'Équipe','col.pj':'PJ','col.v':'V','col.d':'D','col.bp':'BP','col.bc':'BC','col.diff':'+/-','col.pts':'PTS',
   'br.eyebrow':'La route vers la Coupe','br.titre':'Éliminatoires','br.sous':'Le tableau des séries. Le dernier debout soulève la Coupe.',
@@ -573,7 +579,7 @@ const DICT = {
   'ea.adm':'Admin · EA Import (private club matches)','ea.admNote':'Fetches the latest private matches of a team that has an EA club ID. Links players by gamertag.','ea.btn':'📥 Import from EA','ea.titre':'Import from EA','ea.choisir':'Pick a team (with an EA club ID) to fetch its latest private club matches.','ea.equipe':'Team to import','ea.chercher':'Find matches','ea.confirmer':'Import checked matches',
   'ea.aucunClub':'No team has an EA club ID. Add it in the team\'s details.','ea.chargement':'Connecting to EA… (10-20 sec)','ea.erreur':'EA connection error. Try again in a few minutes.','ea.matchsTrouves':'match(es) found','ea.pretsImport':'ready to import','ea.horsLigue':'opponent not in tournament','ea.nul':'tie (skipped)','ea.deja':'already imported','ea.nonRelies':'unlinked player(s)','ea.nouveaux':'new players','ea.importEnCours':'Importing…','ea.rienCoche':'Check at least one match.','ea.fini':'{n} match(es) imported! Stats are up to date.','ea.finiPlus':'{n} match(es) imported · {j} player(s) created! Stats are up to date.',
   'me.titre':'Top scorers','me.joueur':'Player','me.equipe':'Team','me.b':'G','me.a':'A',
-  'nav.calendrier':'Schedule','cal.eyebrow':'Schedule','cal.titre':'Schedule','cal.sous':'Who plays who. Scores show up once matches are played.','cal.adm':'Admin · Add a match to the schedule','cal.admNote':'Create the planned matchups. They fill in with the score when you enter/import the result.','cal.ajouter':'Add to schedule','cal.vide.t':'Schedule coming soon','cal.vide.s':'Planned matchups will appear here.',
+  'nav.calendrier':'Schedule','cal.eyebrow':'Schedule','cal.titre':'Schedule','cal.sous':'Who plays who. Scores show up once matches are played.','cal.adm':'Admin · Add a match to the schedule','cal.admNote':'Create the planned matchups. They fill in with the score when you enter/import the result.','cal.ajouter':'Add to schedule','cal.ph.heure':'Time (e.g. 8:00pm) — optional','cal.vide.t':'Schedule coming soon','cal.vide.s':'Planned matchups will appear here.',
   'po.poule':'Group','po.tourNul':'No tournament','po.tourNul.s':'Create a tournament to get started.','po.eqVide':'No teams','po.eqVide.s':'Confirmed teams will appear here, split into groups.','po.3e':'Third-place match',
   'col.eq':'Team','col.pj':'GP','col.v':'W','col.d':'L','col.bp':'GF','col.bc':'GA','col.diff':'+/-','col.pts':'PTS',
   'br.eyebrow':'The road to the Cup','br.titre':'Playoffs','br.sous':'The playoff bracket. The last one standing lifts the Cup.',
@@ -764,12 +770,29 @@ function ajouterAuCalendrier(){
   const t=tournoiParId(tournoiActif); if(!t){ alert('Choisis un tournoi.'); return; }
   const domId=document.getElementById('cal-dom').value, extId=document.getElementById('cal-ext').value;
   if(!domId||!extId||domId===extId){ alert('Choisis deux équipes différentes.'); return; }
+  const heure=(document.getElementById('cal-heure').value||'').trim();
+  // ordre = 1 de plus que le dernier match déjà à l'horaire (respecte l'ordre d'ajout)
+  const dejaLa=calDuTournoi(t.id);
+  const ordre=dejaLa.reduce((max,c)=>Math.max(max, (typeof c.ordre==='number'?c.ordre:0)), 0) + 1;
   const eqs=equipesDuTournoi(t.id); const dom=eqParId(eqs,domId), ext=eqParId(eqs,extId);
-  db.collection('tCalendrier').add({tournoiId:t.id, domId, domNom:dom.nom, extId, extNom:ext.nom,
-    createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(e=>alert(e.message));
+  db.collection('tCalendrier').add({tournoiId:t.id, domId, domNom:dom.nom, extId, extNom:ext.nom, heure, ordre,
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(()=>{ document.getElementById('cal-heure').value=''; })
+    .catch(e=>alert(e.message));
 }
 function supprimerCalendrier(id){ if(confirm('Retirer ce match de l\'horaire ?')) db.collection('tCalendrier').doc(id).delete().catch(e=>alert(e.message)); }
-function calDuTournoi(tid){ const a=[]; if(snapCal) snapCal.forEach(d=>{const c=d.data(); if(c.tournoiId===tid) a.push({id:d.id,...c});}); return a; }
+function calDuTournoi(tid){
+  const a=[]; if(snapCal) snapCal.forEach(d=>{const c=d.data(); if(c.tournoiId===tid) a.push({id:d.id,...c});});
+  // tri par ordre d'insertion (ordre, sinon createdAt)
+  a.sort((x,y)=>{
+    const ox=(typeof x.ordre==='number')?x.ordre:1e9, oy=(typeof y.ordre==='number')?y.ordre:1e9;
+    if(ox!==oy) return ox-oy;
+    const tx=x.createdAt&&x.createdAt.toDate?x.createdAt.toDate().getTime():0;
+    const ty=y.createdAt&&y.createdAt.toDate?y.createdAt.toDate().getTime():0;
+    return tx-ty;
+  });
+  return a;
+}
 
 /* Cherche un match JOUÉ entre 2 équipes (peu importe l'ordre) */
 function scoreEntre(tid, aId, bId){
@@ -787,11 +810,13 @@ function rendreCalendrier(){
   const cal=calDuTournoi(t.id);
   if(cal.length===0){ cont.innerHTML=videHTML('📅',T('cal.vide.t'),T('cal.vide.s')); return; }
   let html='<div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">';
-  cal.forEach(c=>{
+  cal.forEach((c,i)=>{
     const sc=scoreEntre(t.id, c.domId, c.extId);
     const joue = !!sc;
     const dg=joue&&sc.sdA>sc.sdB, eg=joue&&sc.sdB>sc.sdA;
     html+='<div class="match-l'+(joue?'':' avenir')+'">'
+      +'<span class="cal-no">'+(i+1)+'</span>'
+      + (c.heure?'<span class="cal-heure">🕐 '+esc(c.heure)+'</span>':'')
       +'<div class="e d"><span class="'+(dg?'gagne':'')+'">'+esc(c.domNom)+'</span></div>'
       +'<div class="sc">'+(joue?('<span class="'+(dg?'gagne':'')+'">'+sc.sdA+'</span><small>–</small><span class="'+(eg?'gagne':'')+'">'+sc.sdB+'</span>'):'VS')+'</div>'
       +'<div class="e"><span class="'+(eg?'gagne':'')+'">'+esc(c.extNom)+'</span></div>'
