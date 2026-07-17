@@ -176,6 +176,10 @@ tr.q td.eq::after{content:' ✓';color:var(--vert);font-size:11px}
 .br-team.win .nm{color:var(--cyan);font-weight:700}
 .br-team.win .s{color:var(--cyan)}
 .col-ph.finale .br-match{border-color:var(--bordure-cyan);box-shadow:0 0 24px rgba(56,198,230,.1)}
+.br-saisie{display:flex;gap:5px;align-items:center;padding:7px 8px;border-top:1px solid var(--bordure)}
+.br-saisie input{width:100%;margin:0;padding:6px 6px;font-size:12px;text-align:center}
+.br-saisie .btn-mini{padding:6px 9px;white-space:nowrap}
+.br-saisie .del-btn{padding:6px 8px}
 .champion-box{flex:none;min-width:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .champion-box .cup-ico{font-size:52px;filter:drop-shadow(0 0 18px rgba(230,184,76,.5))}
 .champion-box .lbl{font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--or);margin-top:6px}
@@ -423,27 +427,6 @@ footer a{color:var(--cyan);text-decoration:none}
   <section class="page" id="bracket">
     <div class="page-head"><div class="eyebrow" data-i18n="br.eyebrow">La route vers la Coupe</div><h2 data-i18n="br.titre">Éliminatoires</h2><p data-i18n="br.sous">Le tableau des séries. Le dernier debout soulève la Coupe.</p></div>
     <div class="select-tournoi"><label data-i18n="commun.tournoi">Tournoi</label><select id="bracket-select" onchange="changerTournoiActif(this.value)"></select></div>
-    <div class="admin-panel admin-only">
-      <div class="lbl" data-i18n="br.adm">Admin · Ajouter un match de séries</div>
-      <div class="deux-cols">
-        <select id="mb-phase">
-          <option value="quart" data-i18n="br.quart">Quart de finale</option>
-          <option value="demi" data-i18n="br.demi">Demi-finale</option>
-          <option value="petite" data-i18n="br.petite">Petite finale (3e place)</option>
-          <option value="finale" data-i18n="br.finale">FINALE</option>
-        </select>
-        <div></div>
-      </div>
-      <div class="deux-cols">
-        <select id="mb-dom"></select>
-        <select id="mb-ext"></select>
-      </div>
-      <div class="deux-cols">
-        <input id="mb-sd" type="number" min="0" placeholder="Buts (vide = à jouer)" data-i18n-ph="br.ph.buts">
-        <input id="mb-se" type="number" min="0" placeholder="Buts (vide = à jouer)" data-i18n-ph="br.ph.buts">
-      </div>
-      <button class="btn btn-cyan" onclick="ajouterMatchBracket()" data-i18n="br.ajouter">Ajouter au tableau</button>
-    </div>
     <div id="bracket-contenu"></div>
   </section>
 
@@ -548,7 +531,7 @@ const DICT = {
   'col.eq':'Équipe','col.pj':'PJ','col.v':'V','col.d':'D','col.bp':'BP','col.bc':'BC','col.diff':'+/-','col.pts':'PTS',
   'br.eyebrow':'La route vers la Coupe','br.titre':'Éliminatoires','br.sous':'Le tableau des séries. Le dernier debout soulève la Coupe.',
   'br.adm':'Admin · Ajouter un match de séries','br.quart':'Quart de finale','br.demi':'Demi-finale','br.petite':'Petite finale (3e place)','br.finale':'FINALE','br.ajouter':'Ajouter au tableau','br.ph.buts':'Buts (vide = à jouer)',
-  'br.quarts':'Quarts de finale','br.demis':'Demi-finales','br.finaleT':'Finale','br.avenir':'À venir','br.acouronner':'À couronner',
+  'br.quarts':'Quarts de finale','br.demis':'Demi-finales','br.finaleT':'Finale','br.avenir':'À venir','br.acouronner':'À couronner','br.tbd':'À déterminer','br.entreScore':'Entre les deux scores.','br.pasEgalite':'Pas d\'égalité en séries — il faut un gagnant.','br.enr':'OK','br.effacer':'Effacer ce résultat ?','br.couronner':'🏆 Couronner champion','br.confirmCouronne':'Couronner cette équipe championne et terminer le tournoi ?',
   'br.vide.t':'Les séries s\'en viennent','br.vide.s':'Une fois les poules terminées, le tableau des éliminatoires apparaîtra ici — la route vers la Coupe.',
   'ch.eyebrow':'Temple de la renommée','ch.titre':'Champions','ch.sous':'Les équipes qui ont soulevé la Coupe.','ch.vide.t':'Aucun champion... pour l\'instant','ch.vide.s':'Le premier nom gravé sur la Coupe arrive bientôt.',
   'foot.l1':'Dynasty Hockey League · NHL 27 · World of Chel','foot.retour':'← Retour au site de la ligue',
@@ -584,7 +567,7 @@ const DICT = {
   'col.eq':'Team','col.pj':'GP','col.v':'W','col.d':'L','col.bp':'GF','col.bc':'GA','col.diff':'+/-','col.pts':'PTS',
   'br.eyebrow':'The road to the Cup','br.titre':'Playoffs','br.sous':'The playoff bracket. The last one standing lifts the Cup.',
   'br.adm':'Admin · Add a playoff match','br.quart':'Quarter-final','br.demi':'Semi-final','br.petite':'Third-place game','br.finale':'FINAL','br.ajouter':'Add to bracket','br.ph.buts':'Goals (empty = to play)',
-  'br.quarts':'Quarter-finals','br.demis':'Semi-finals','br.finaleT':'Final','br.avenir':'TBD','br.acouronner':'To be crowned',
+  'br.quarts':'Quarter-finals','br.demis':'Semi-finals','br.finaleT':'Final','br.avenir':'TBD','br.acouronner':'To be crowned','br.tbd':'TBD','br.entreScore':'Enter both scores.','br.pasEgalite':'No ties in playoffs — need a winner.','br.enr':'OK','br.effacer':'Delete this result?','br.couronner':'🏆 Crown champion','br.confirmCouronne':'Crown this team champion and finish the tournament?',
   'br.vide.t':'Playoffs coming soon','br.vide.s':'Once the group stage ends, the playoff bracket will appear here — the road to the Cup.',
   'ch.eyebrow':'Hall of fame','ch.titre':'Champions','ch.sous':'The teams that lifted the Cup.','ch.vide.t':'No champions... yet','ch.vide.s':'The first name on the Cup is coming soon.',
   'foot.l1':'Dynasty Hockey League · NHL 27 · World of Chel','foot.retour':'← Back to the league site',
@@ -1130,61 +1113,119 @@ function rendreMeneursTournoi(tid){
   cont.innerHTML=html;
 }
 
-/* ===================== BRACKET ===================== */
-function ajouterMatchBracket(){
-  const t=tournoiParId(tournoiActif); if(!t) return;
-  const phase=document.getElementById('mb-phase').value;
-  const domId=document.getElementById('mb-dom').value, extId=document.getElementById('mb-ext').value;
-  if(!domId||!extId||domId===extId){ alert('Choisis deux équipes différentes.'); return; }
-  const sdv=document.getElementById('mb-sd').value, sev=document.getElementById('mb-se').value;
-  const sd=sdv===''?null:parseInt(sdv), se=sev===''?null:parseInt(sev);
-  const joue = sd!==null && se!==null;
-  const eqs=equipesDuTournoi(t.id); const dom=eqParId(eqs,domId), ext=eqParId(eqs,extId);
-  db.collection('tMatchs').add({tournoiId:t.id,phase,domId,domNom:dom.nom,extId,extNom:ext.nom,
-    scoreDom:sd,scoreExt:se,joue,createdAt:firebase.firestore.FieldValue.serverTimestamp()})
-    .then(()=>{ document.getElementById('mb-sd').value=''; document.getElementById('mb-se').value=''; })
-    .catch(e=>alert(e.message));
+/* ===================== BRACKET AUTOMATIQUE ===================== */
+/* Classement global (toutes poules confondues) — pour ranger le top 4 */
+function classementGlobal(tid, eqs){
+  const st={};
+  eqs.forEach(e=>{ st[e.id]={id:e.id,nom:e.nom,couleur:e.couleur,pj:0,bp:0,bc:0,pts:0}; });
+  matchsDuTournoi(tid).filter(m=>m.phase==='poule' && m.joue).forEach(m=>{
+    const a=st[m.domId], b=st[m.extId]; if(!a||!b) return;
+    a.pj++; b.pj++; a.bp+=+m.scoreDom; a.bc+=+m.scoreExt; b.bp+=+m.scoreExt; b.bc+=+m.scoreDom;
+    if(+m.scoreDom>+m.scoreExt){ a.pts+=2; } else if(+m.scoreExt>+m.scoreDom){ b.pts+=2; } else { a.pts++; b.pts++; }
+  });
+  return Object.values(st).sort((x,y)=> y.pts-x.pts || (y.bp-y.bc)-(x.bp-x.bc) || y.bp-x.bp || (x.nom||'').localeCompare(y.nom||''));
 }
+/* Cherche un match d'une phase donnée entre 2 équipes (peu importe l'ordre) */
+function matchSerieEntre(tid, phase, aId, bId){
+  let r=null;
+  matchsDuTournoi(tid).forEach(m=>{ if(m.phase!==phase||!aId||!bId) return;
+    if((m.domId===aId&&m.extId===bId)||(m.domId===bId&&m.extId===aId)) r=m;
+  });
+  return r;
+}
+function gagnantDe(m){ if(!m||!m.joue) return null; if(+m.scoreDom>+m.scoreExt) return m.domId; if(+m.scoreExt>+m.scoreDom) return m.extId; return null; }
+function perdantDe(m){ const g=gagnantDe(m); if(!g) return null; return g===m.domId?m.extId:m.domId; }
+
+/* Enregistre/modifie un match de série à partir des inputs inline */
+function enregistrerSerie(phase, aId, bId, aNom, bNom, idA, idB){
+  const t=tournoiParId(tournoiActif); if(!t) return;
+  const sa=parseInt(document.getElementById(idA).value), sb=parseInt(document.getElementById(idB).value);
+  if(isNaN(sa)||isNaN(sb)){ alert(T('br.entreScore')); return; }
+  if(sa===sb){ alert(T('br.pasEgalite')); return; }
+  const ancien=matchSerieEntre(t.id, phase, aId, bId);
+  if(ancien){ db.collection('tMatchs').doc(ancien.id).update({scoreDom:(ancien.domId===aId?sa:sb),scoreExt:(ancien.domId===aId?sb:sa),joue:true}).catch(e=>alert(e.message)); }
+  else { db.collection('tMatchs').add({tournoiId:t.id,phase,domId:aId,domNom:aNom,extId:bId,extNom:bNom,scoreDom:sa,scoreExt:sb,joue:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(e=>alert(e.message)); }
+}
+function effacerSerie(id){ if(confirm(T('br.effacer'))) db.collection('tMatchs').doc(id).delete().catch(e=>alert(e.message)); }
+function couronnerChampion(eqId){ const t=tournoiParId(tournoiActif); if(!t) return; if(confirm(T('br.confirmCouronne'))) db.collection('tournois').doc(t.id).update({champion:eqId,statut:'termine'}).catch(e=>alert(e.message)); }
+
 function rendreBracket(){
   const c=document.getElementById('bracket-contenu'); if(!c) return;
   const t=tournoiParId(tournoiActif);
   if(!t){ c.innerHTML=videHTML('🏆',T('po.tourNul'),''); return; }
-  const ms=matchsDuTournoi(t.id);
-  const phases=[['quart',T('br.quarts')],['demi',T('br.demis')],['finale',T('br.finaleT')]];
-  const aDesSeries = ms.some(m=>['quart','demi','finale','petite'].includes(m.phase));
-  if(!aDesSeries){ c.innerHTML=videHTML('🏆',T('br.vide.t'),T('br.vide.s')); return; }
+  const eqs=equipesDuTournoi(t.id);
+  if(eqs.length<2){ c.innerHTML=videHTML('🏆',T('br.vide.t'),T('br.vide.s')); return; }
+  const cl=classementGlobal(t.id, eqs);
+
+  // Seeds (top 4) — connus seulement si l'équipe a joué au moins 1 match
+  const seed=[0,1,2,3].map(i=>{ const s=cl[i]; return (s && s.pj>0) ? s : null; });
+  // Demi 1 : 1er vs 4e · Demi 2 : 2e vs 3e
+  const d1a=seed[0], d1b=seed[3], d2a=seed[1], d2b=seed[2];
+  const mDemi1 = (d1a&&d1b)?matchSerieEntre(t.id,'demi',d1a.id,d1b.id):null;
+  const mDemi2 = (d2a&&d2b)?matchSerieEntre(t.id,'demi',d2a.id,d2b.id):null;
+  // Gagnants des demies -> finale
+  const g1=gagnantDe(mDemi1), g2=gagnantDe(mDemi2);
+  const fA = g1?eqParId(eqs,g1):null, fB = g2?eqParId(eqs,g2):null;
+  const mFinale = (fA&&fB)?matchSerieEntre(t.id,'finale',fA.id,fB.id):null;
+  const champId = gagnantDe(mFinale) || (t.champion||null);
+  const champ = champId?eqParId(eqs,champId):null;
+
   let html='<div class="bracket">';
-  phases.forEach(([ph,titre],idx)=>{
-    const list=ms.filter(m=>m.phase===ph);
-    html+='<div class="col-ph'+(ph==='finale'?' finale':'')+'"><div class="ph-titre">'+titre+'</div>';
-    if(list.length===0){ html+='<div style="color:var(--argent2);font-size:12px;text-align:center;padding:20px 0">'+T('br.avenir')+'</div>'; }
-    list.forEach(m=>html+=brMatchHTML(m));
-    html+='</div>';
-  });
-  // champion box
-  const finale=ms.find(m=>m.phase==='finale'&&m.joue);
-  let champNom=null;
-  if(finale){ champNom = (+finale.scoreDom>+finale.scoreExt)?finale.domNom:finale.extNom; }
-  if(t.champion){ const ce=eqParId(equipesDuTournoi(t.id),t.champion); if(ce) champNom=ce.nom; }
-  html+='<div class="champion-box"><div class="cup-ico">🏆</div><div class="lbl">'+T('cup.champion')+'</div>'
-    + (champNom?'<div class="nm">'+esc(champNom)+'</div>':'<div class="attente">'+T('br.acouronner')+'</div>')+'</div>';
+  // Colonne DEMI-FINALES
+  html+='<div class="col-ph"><div class="ph-titre">'+T('br.demis')+'</div>';
+  html+=brSlot('demi', d1a, d1b, mDemi1, 'd1', T('br.demi')+' 1');
+  html+=brSlot('demi', d2a, d2b, mDemi2, 'd2', T('br.demi')+' 2');
   html+='</div>';
-  // petite finale
-  const petite=ms.filter(m=>m.phase==='petite');
-  if(petite.length){
-    html+='<div class="pool-titre" style="margin-top:26px">'+T('po.3e')+'</div>';
-    petite.forEach(m=>html+='<div style="max-width:300px">'+brMatchHTML(m)+'</div>');
+  // Colonne FINALE
+  html+='<div class="col-ph finale"><div class="ph-titre">'+T('br.finaleT')+'</div>';
+  html+=brSlot('finale', fA, fB, mFinale, 'fin', T('br.finaleT'));
+  html+='</div>';
+  // Champion
+  html+='<div class="champion-box"><div class="cup-ico">🏆</div><div class="lbl">'+T('cup.champion')+'</div>'
+    + (champ?'<div class="nm">'+esc(champ.nom)+'</div>':'<div class="attente">'+T('br.acouronner')+'</div>');
+  if(estAdmin && champId && !t.champion){ html+='<button class="btn-mini ok admin-only inline" style="margin-top:10px" onclick="couronnerChampion(\''+champId+'\')">'+T('br.couronner')+'</button>'; }
+  html+='</div>';
+  html+='</div>';
+
+  // Petite finale (3e place) — les 2 perdants des demies
+  const p1=perdantDe(mDemi1), p2=perdantDe(mDemi2);
+  if(p1&&p2){
+    const pa=eqParId(eqs,p1), pb=eqParId(eqs,p2);
+    const mPetite=matchSerieEntre(t.id,'petite',p1,p2);
+    html+='<div class="pool-titre" style="margin-top:28px">'+T('po.3e')+'</div>';
+    html+='<div style="max-width:340px">'+brSlot('petite', pa, pb, mPetite, 'pf', '')+'</div>';
   }
+
   c.innerHTML=html;
 }
-function brMatchHTML(m){
-  const joue=m.joue;
-  const dg=joue&&+m.scoreDom>+m.scoreExt, eg=joue&&+m.scoreExt>+m.scoreDom;
-  return '<div class="br-match">'
-    +'<div class="br-team'+(dg?' win':'')+'"><span class="nm">'+esc(m.domNom)+'</span><span class="s">'+(joue?m.scoreDom:'–')+'</span></div>'
-    +'<div class="br-team'+(eg?' win':'')+'"><span class="nm">'+esc(m.extNom)+'</span><span class="s">'+(joue?m.scoreExt:'–')+'</span></div>'
-    + (estAdmin?'<div class="admin-only" style="padding:6px 10px;border-top:1px solid var(--bordure);text-align:right"><button class="del-btn" onclick="supprimerMatch(\''+m.id+'\')">Supprimer</button></div>':'')
-    +'</div>';
+
+/* Un affrontement du bracket : équipes (ou À déterminer) + score OU saisie admin */
+function brSlot(phase, eqA, eqB, m, key, sousTitre){
+  const joue=!!(m&&m.joue);
+  // scores orientés selon eqA/eqB
+  let sA='–', sB='–', winA=false, winB=false;
+  if(joue){
+    sA = (m.domId===eqA.id)?m.scoreDom:m.scoreExt;
+    sB = (m.domId===eqA.id)?m.scoreExt:m.scoreDom;
+    winA = +sA>+sB; winB = +sB>+sA;
+  }
+  const nomA = eqA?esc(eqA.nom):('<span style="color:var(--argent2)">'+T('br.tbd')+'</span>');
+  const nomB = eqB?esc(eqB.nom):('<span style="color:var(--argent2)">'+T('br.tbd')+'</span>');
+  let h='<div class="br-match">';
+  h+='<div class="br-team'+(winA?' win':'')+'"><span class="nm">'+nomA+'</span><span class="s">'+(joue?sA:'–')+'</span></div>';
+  h+='<div class="br-team'+(winB?' win':'')+'"><span class="nm">'+nomB+'</span><span class="s">'+(joue?sB:'–')+'</span></div>';
+  // Saisie admin (si les 2 équipes sont connues)
+  if(estAdmin && eqA && eqB){
+    const idA='sc-'+key+'-a', idB='sc-'+key+'-b';
+    h+='<div class="admin-only br-saisie">'
+      +'<input id="'+idA+'" type="number" min="0" value="'+(joue?sA:'')+'" placeholder="'+esc(eqA.nom).slice(0,6)+'">'
+      +'<input id="'+idB+'" type="number" min="0" value="'+(joue?sB:'')+'" placeholder="'+esc(eqB.nom).slice(0,6)+'">'
+      +'<button class="btn-mini" onclick="enregistrerSerie(\''+phase+'\',\''+eqA.id+'\',\''+eqB.id+'\',\''+esc(eqA.nom).replace(/'/g,"\\\\'")+'\',\''+esc(eqB.nom).replace(/'/g,"\\\\'")+'\',\''+idA+'\',\''+idB+'\')">'+T('br.enr')+'</button>'
+      + (m?'<button class="del-btn" onclick="effacerSerie(\''+m.id+'\')">✕</button>':'')
+      +'</div>';
+  }
+  h+='</div>';
+  return h;
 }
 
 /* ===================== INSCRIPTIONS ===================== */
