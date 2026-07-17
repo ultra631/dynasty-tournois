@@ -145,6 +145,23 @@ tr.q td.eq::after{content:' ✓';color:var(--vert);font-size:11px}
 .pool-titre{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
   color:var(--cyan);margin:26px 0 12px;display:flex;align-items:center;gap:10px}
 .pool-titre::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--bordure-cyan),transparent)}
+.stat-section-titre{font-family:'Oswald',sans-serif;font-size:17px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--glace);margin:20px 0 14px;display:flex;align-items:center;gap:10px}
+.stat-grille{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.stat-carte{padding:16px 18px}
+.stat-titre{font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--bordure)}
+.stat-liste{display:flex;flex-direction:column;gap:2px}
+.stat-ligne{display:flex;align-items:center;gap:10px;padding:7px 0}
+.stat-ligne+.stat-ligne{border-top:1px solid rgba(120,160,190,.06)}
+.stat-rang{flex:none;width:22px;height:22px;border-radius:50%;background:rgba(56,198,230,.1);color:var(--cyan);
+  font-family:'Bebas Neue',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center}
+.stat-ligne:first-child .stat-rang{background:var(--grad-or);color:var(--nuit)}
+.stat-nom{flex:1;font-size:13.5px;font-weight:600;display:flex;flex-direction:column;line-height:1.2;min-width:0}
+.stat-nom small{font-size:11px;font-weight:400;color:var(--argent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stat-val{flex:none;font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--glace);letter-spacing:.02em;display:flex;align-items:baseline;gap:3px}
+.stat-val em{font-family:'Inter',sans-serif;font-size:10px;font-style:normal;color:var(--argent2)}
+.stat-vide,.stat-liste:empty{color:var(--argent2);font-size:13px;padding:10px 0}
 
 /* Matchs (ligne de score) */
 .match-l{display:flex;align-items:center;gap:12px;background:var(--acier2);border:1px solid var(--bordure);
@@ -282,6 +299,7 @@ footer a{color:var(--cyan);text-decoration:none}
       <a class="nav-link" data-route="poules" href="#poules" data-i18n="nav.poules">Poules</a>
       <a class="nav-link" data-route="calendrier" href="#calendrier" data-i18n="nav.calendrier">Calendrier</a>
       <a class="nav-link" data-route="bracket" href="#bracket" data-i18n="nav.bracket">Éliminatoires</a>
+      <a class="nav-link" data-route="stats" href="#stats" data-i18n="nav.stats">Top Stats</a>
       <a class="nav-link" data-route="champions" href="#champions" data-i18n="nav.champions">Champions</a>
     </nav>
     <button class="lang-btn" id="lang-btn" onclick="basculerLangue()" title="Language / Langue">EN</button>
@@ -430,6 +448,13 @@ footer a{color:var(--cyan);text-decoration:none}
     <div id="bracket-contenu"></div>
   </section>
 
+  <!-- TOP STATS -->
+  <section class="page" id="stats">
+    <div class="page-head"><div class="eyebrow" data-i18n="ts.eyebrow">Meneurs du tournoi</div><h2 data-i18n="ts.titre">Top Stats</h2><p data-i18n="ts.sous">Les meilleurs patineurs et gardiens du tournoi.</p></div>
+    <div class="select-tournoi"><label data-i18n="commun.tournoi">Tournoi</label><select id="stats-select" onchange="changerTournoiActif(this.value)"></select></div>
+    <div id="stats-contenu"></div>
+  </section>
+
   <!-- CHAMPIONS -->
   <section class="page" id="champions">
     <div class="page-head"><div class="eyebrow" data-i18n="ch.eyebrow">Temple de la renommée</div><h2 data-i18n="ch.titre">Champions</h2><p data-i18n="ch.sous">Les équipes qui ont soulevé la Coupe.</p></div>
@@ -526,6 +551,7 @@ const DICT = {
   'ea.adm':'Admin · Import EA (matchs privés de club)','ea.admNote':'Va chercher les derniers matchs privés d\'une équipe qui a un ID club EA. Relie les joueurs par gamertag.','ea.btn':'📥 Importer depuis EA','ea.titre':'Importer depuis EA','ea.choisir':'Choisis une équipe (qui a un ID club EA) pour aller chercher ses derniers matchs privés de club.','ea.equipe':'Équipe à importer','ea.chercher':'Chercher les matchs','ea.confirmer':'Importer les matchs cochés',
   'ea.aucunClub':'Aucune équipe n\'a d\'ID club EA. Ajoute-le dans la fiche de l\'équipe.','ea.chargement':'Connexion à EA… (10-20 sec)','ea.erreur':'Erreur de connexion à EA. Réessaie dans quelques minutes.','ea.matchsTrouves':'match(s) trouvé(s)','ea.pretsImport':'prêt(s) à importer','ea.horsLigue':'adversaire hors-tournoi','ea.nul':'égalité (ignoré)','ea.deja':'déjà importé','ea.nonRelies':'joueur(s) non reliés','ea.nouveaux':'nouveaux joueurs','ea.importEnCours':'Import en cours…','ea.rienCoche':'Coche au moins un match.','ea.fini':'{n} match(s) importé(s)! Les stats sont à jour.','ea.finiPlus':'{n} match(s) importé(s) · {j} joueur(s) créé(s)! Les stats sont à jour.',
   'me.titre':'Meilleurs pointeurs','me.joueur':'Joueur','me.equipe':'Équipe','me.b':'B','me.a':'A',
+  'nav.stats':'Top Stats','ts.eyebrow':'Meneurs du tournoi','ts.titre':'Top Stats','ts.sous':'Les meilleurs patineurs et gardiens du tournoi.','ts.patineurs':'Patineurs','ts.gardiens':'Gardiens','ts.buteurs':'Top buteurs','ts.passeurs':'Top passeurs','ts.pointeurs':'Top pointeurs','ts.efficacite':'% Efficacité','ts.moyenne':'Moyenne (buts/match)','ts.victoires':'Victoires','ts.aucun':'—','ts.vide.t':'Aucune stat pour l\'instant','ts.vide.s':'Les stats apparaîtront après les premiers matchs importés.',
   'nav.calendrier':'Calendrier','cal.eyebrow':'Horaire','cal.titre':'Calendrier','cal.sous':'Qui joue contre qui. Les scores s\'affichent une fois les matchs joués.','cal.adm':'Admin · Ajouter un match à l\'horaire','cal.admNote':'Crée les affrontements prévus. Ils se remplissent avec le score quand tu entres/importes le résultat.','cal.ajouter':'Ajouter au calendrier','cal.ph.heure':'Heure (ex. 20h00) — optionnel','cal.vide.t':'Horaire à venir','cal.vide.s':'Les affrontements prévus apparaîtront ici.',
   'po.poule':'Poule','po.tourNul':'Aucun tournoi','po.tourNul.s':'Crée un tournoi pour commencer.','po.eqVide':'Aucune équipe','po.eqVide.s':'Les équipes confirmées apparaîtront ici, réparties en poules.','po.3e':'Match pour la 3e place',
   'col.eq':'Équipe','col.pj':'PJ','col.v':'V','col.d':'D','col.bp':'BP','col.bc':'BC','col.diff':'+/-','col.pts':'PTS',
@@ -562,6 +588,7 @@ const DICT = {
   'ea.adm':'Admin · EA Import (private club matches)','ea.admNote':'Fetches the latest private matches of a team that has an EA club ID. Links players by gamertag.','ea.btn':'📥 Import from EA','ea.titre':'Import from EA','ea.choisir':'Pick a team (with an EA club ID) to fetch its latest private club matches.','ea.equipe':'Team to import','ea.chercher':'Find matches','ea.confirmer':'Import checked matches',
   'ea.aucunClub':'No team has an EA club ID. Add it in the team\'s details.','ea.chargement':'Connecting to EA… (10-20 sec)','ea.erreur':'EA connection error. Try again in a few minutes.','ea.matchsTrouves':'match(es) found','ea.pretsImport':'ready to import','ea.horsLigue':'opponent not in tournament','ea.nul':'tie (skipped)','ea.deja':'already imported','ea.nonRelies':'unlinked player(s)','ea.nouveaux':'new players','ea.importEnCours':'Importing…','ea.rienCoche':'Check at least one match.','ea.fini':'{n} match(es) imported! Stats are up to date.','ea.finiPlus':'{n} match(es) imported · {j} player(s) created! Stats are up to date.',
   'me.titre':'Top scorers','me.joueur':'Player','me.equipe':'Team','me.b':'G','me.a':'A',
+  'nav.stats':'Top Stats','ts.eyebrow':'Tournament leaders','ts.titre':'Top Stats','ts.sous':'The tournament\'s best skaters and goalies.','ts.patineurs':'Skaters','ts.gardiens':'Goalies','ts.buteurs':'Top goal scorers','ts.passeurs':'Top playmakers','ts.pointeurs':'Top point leaders','ts.efficacite':'Save %','ts.moyenne':'GAA (goals/game)','ts.victoires':'Wins','ts.aucun':'—','ts.vide.t':'No stats yet','ts.vide.s':'Stats will appear after the first imported matches.',
   'nav.calendrier':'Schedule','cal.eyebrow':'Schedule','cal.titre':'Schedule','cal.sous':'Who plays who. Scores show up once matches are played.','cal.adm':'Admin · Add a match to the schedule','cal.admNote':'Create the planned matchups. They fill in with the score when you enter/import the result.','cal.ajouter':'Add to schedule','cal.ph.heure':'Time (e.g. 8:00pm) — optional','cal.vide.t':'Schedule coming soon','cal.vide.s':'Planned matchups will appear here.',
   'po.poule':'Group','po.tourNul':'No tournament','po.tourNul.s':'Create a tournament to get started.','po.eqVide':'No teams','po.eqVide.s':'Confirmed teams will appear here, split into groups.','po.3e':'Third-place match',
   'col.eq':'Team','col.pj':'GP','col.v':'W','col.d':'L','col.bp':'GF','col.bc':'GA','col.diff':'+/-','col.pts':'PTS',
@@ -605,7 +632,7 @@ function appliquerRoles(){ document.body.classList.toggle('is-admin', estAdmin);
 function fermerModale(id){ document.getElementById(id).classList.remove('open'); }
 
 /* ===================== ROUTEUR ===================== */
-const ROUTES=['accueil','tournois','inscriptions','poules','calendrier','bracket','champions'];
+const ROUTES=['accueil','tournois','inscriptions','poules','calendrier','bracket','stats','champions'];
 function afficherRoute(){
   let h=(location.hash||'#accueil').slice(1);
   if(!ROUTES.includes(h)) h='accueil';
@@ -644,7 +671,7 @@ function rafraichir(){
     snapTournois.forEach(d=>{ const t=d.data(); if(!premier) premier=d.id; if(!choix && t.statut!=='termine') choix=d.id; });
     tournoiActif = choix || premier;
   }
-  rendreTournois(); rendreVedette(); rendreSelects(); rendrePoules(); rendreCalendrier(); rendreBracket(); rendreChampions(); rendreInscriptionsAdmin(); rendreSelectInscription();
+  rendreTournois(); rendreVedette(); rendreSelects(); rendrePoules(); rendreCalendrier(); rendreBracket(); rendreStats(); rendreChampions(); rendreInscriptionsAdmin(); rendreSelectInscription();
 }
 
 /* ===================== TOURNOIS ===================== */
@@ -731,7 +758,7 @@ function rendreVedette(){
 
 /* ===================== SELECTS (poules/bracket + admin) ===================== */
 function rendreSelects(){
-  ['poules-select','bracket-select','cal-select'].forEach(id=>{
+  ['poules-select','bracket-select','cal-select','stats-select'].forEach(id=>{
     const s=document.getElementById(id); if(!s) return;
     let html='';
     snapTournois.forEach(d=>{ const t=d.data(); html+='<option value="'+d.id+'"'+(d.id===tournoiActif?' selected':'')+'>'+esc(t.nom)+'</option>'; });
@@ -842,13 +869,20 @@ function joueursDuTournoi(tid){ const a=[]; if(snapJoueurs) snapJoueurs.forEach(
 
 /* Stats d'un joueur (buts, passes, points, matchs) calculées des tMatchs */
 function statsJoueurTournoi(pid, tid){
-  let pj=0,b=0,a=0,arr=0,tirs=0;
+  let pj=0,b=0,a=0,arr=0,tirs=0, gPj=0, gV=0, ba=0;
   if(snapMatchs) snapMatchs.forEach(d=>{ const m=d.data(); if(m.tournoiId!==tid) return;
     const l=(m.lignes||[]).find(x=>x.pid===pid); if(!l) return;
     pj++; b+=+l.b||0; a+=+l.a||0;
-    if(l.tirs!==undefined){ arr+=+l.arr||0; tirs+=+l.tirs||0; }
+    if(l.tirs!==undefined){ // ligne de gardien
+      arr+=+l.arr||0; tirs+=+l.tirs||0; gPj++;
+      ba += Math.max(0, (+l.tirs||0)-(+l.arr||0)); // buts alloués = tirs - arrêts
+      // victoire du gardien : son équipe a gagné ce match
+      if(l.eqId===m.domId && +m.scoreDom>+m.scoreExt) gV++;
+      else if(l.eqId===m.extId && +m.scoreExt>+m.scoreDom) gV++;
+    }
   });
-  return { pj, b, a, pts:b+a, arr, tirs, arrPct: tirs>0?((arr/tirs)*100).toFixed(1)+'%':null };
+  return { pj, b, a, pts:b+a, arr, tirs, arrPct: tirs>0?((arr/tirs)*100).toFixed(1)+'%':null,
+    gPj, gV, ba, arrPctNum: tirs>0?(arr/tirs*100):null, moy: gPj>0?(ba/gPj):null };
 }
 
 /* ===================== MATCHS DE POULE ===================== */
@@ -1090,6 +1124,59 @@ function rendrePoules(){
   });
   c.innerHTML=html||videHTML('🛡️',T('po.eqVide'),T('po.eqVide.s'));
   rendreMeneursTournoi(t.id);
+}
+
+/* ===================== TOP STATS ===================== */
+function rendreStats(){
+  const cont=document.getElementById('stats-contenu'); if(!cont) return;
+  const t=tournoiParId(tournoiActif);
+  if(!t){ cont.innerHTML=videHTML('📊',T('po.tourNul'),''); return; }
+  const tid=t.id;
+  const eqs=equipesDuTournoi(tid);
+  const joueurs=joueursDuTournoi(tid).map(j=>{
+    const eq=eqParId(eqs, j.equipeId)||{};
+    return Object.assign({id:j.id, nom:j.nom, eqNom:eq.nom||'', couleur:eq.couleur}, statsJoueurTournoi(j.id, tid));
+  });
+  const patineurs=joueurs.filter(j=>j.pj>0 && j.gPj<j.pj);
+  const gardiens=joueurs.filter(j=>j.gPj>0);
+  if(patineurs.length===0 && gardiens.length===0){ cont.innerHTML=videHTML('📊',T('ts.vide.t'),T('ts.vide.s')); return; }
+
+  // Génère une carte-classement : titre, liste triée, fonction d'affichage de la valeur
+  function carte(titre, ico, liste, valeurFn, sousLabel){
+    let h='<div class="carte stat-carte"><div class="stat-titre">'+ico+' '+titre+'</div>';
+    if(liste.length===0){ h+='<div class="stat-vide">'+T('ts.aucun')+'</div></div>'; return h; }
+    h+='<div class="stat-liste">';
+    liste.slice(0,5).forEach((j,i)=>{
+      h+='<div class="stat-ligne">'
+        +'<span class="stat-rang">'+(i+1)+'</span>'
+        +'<span class="stat-nom">'+esc(j.nom)+'<small>'+esc(j.eqNom)+'</small></span>'
+        +'<span class="stat-val">'+valeurFn(j)+(sousLabel?'<em>'+sousLabel+'</em>':'')+'</span>'
+        +'</div>';
+    });
+    h+='</div></div>';
+    return h;
+  }
+
+  const parB=patineurs.slice().sort((a,b)=> b.b-a.b || b.pts-a.pts || a.nom.localeCompare(b.nom));
+  const parA=patineurs.slice().sort((a,b)=> b.a-a.a || b.pts-a.pts || a.nom.localeCompare(b.nom));
+  const parPts=patineurs.slice().sort((a,b)=> b.pts-a.pts || b.b-a.b || a.nom.localeCompare(b.nom));
+  const parEff=gardiens.slice().filter(g=>g.arrPctNum!=null).sort((a,b)=> b.arrPctNum-a.arrPctNum || b.gPj-a.gPj);
+  const parMoy=gardiens.slice().filter(g=>g.moy!=null).sort((a,b)=> a.moy-b.moy || b.gPj-a.gPj); // plus bas = meilleur
+  const parVic=gardiens.slice().sort((a,b)=> b.gV-a.gV || (a.moy||99)-(b.moy||99));
+
+  let html='<div class="stat-section-titre">🏒 '+T('ts.patineurs')+'</div>';
+  html+='<div class="grille stat-grille">';
+  html+=carte(T('ts.buteurs'),'🥅',parB,j=>j.b);
+  html+=carte(T('ts.passeurs'),'🎯',parA,j=>j.a);
+  html+=carte(T('ts.pointeurs'),'⭐',parPts,j=>j.pts);
+  html+='</div>';
+  html+='<div class="stat-section-titre" style="margin-top:26px">🧤 '+T('ts.gardiens')+'</div>';
+  html+='<div class="grille stat-grille">';
+  html+=carte(T('ts.efficacite'),'🛡️',parEff,j=>j.arrPctNum.toFixed(1)+'%');
+  html+=carte(T('ts.moyenne'),'📉',parMoy,j=>j.moy.toFixed(2));
+  html+=carte(T('ts.victoires'),'🏆',parVic,j=>j.gV);
+  html+='</div>';
+  cont.innerHTML=html;
 }
 
 /* Meneurs de pointage du tournoi (à partir des stats importées) */
