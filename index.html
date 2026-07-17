@@ -178,6 +178,9 @@ tr.q td.eq::after{content:' ✓';color:var(--vert);font-size:11px}
 .cal-heure{flex:none;font-size:11.5px;font-weight:600;color:var(--argent);letter-spacing:.03em;
   background:rgba(120,160,190,.08);border:1px solid var(--bordure);border-radius:99px;padding:3px 9px;white-space:nowrap}
 .man-entete{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;text-align:center;color:var(--cyan);margin-bottom:14px}
+.man-prolong-lbl{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--glace);cursor:pointer;
+  background:var(--acier2);border:1px solid var(--bordure);border-radius:9px;padding:10px 12px;margin-bottom:14px}
+.man-prolong-lbl input{width:auto;margin:0;accent-color:var(--cyan);flex:none}
 .man-scores{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;margin-bottom:16px}
 .man-joueurs-titre{font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--argent);margin:6px 0 10px}
 .man-ligne{background:var(--acier2);border:1px solid var(--bordure);border-radius:10px;padding:10px;margin-bottom:8px;
@@ -544,6 +547,7 @@ footer a{color:var(--cyan);text-decoration:none}
       <div style="align-self:center;color:var(--argent2);font-family:'Bebas Neue',sans-serif;font-size:22px">–</div>
       <div><label class="champ-lbl" id="man-lbl-ext"></label><input id="man-se" type="number" min="0" placeholder="0"></div>
     </div>
+    <label class="man-prolong-lbl"><input type="checkbox" id="man-prolong"><span data-i18n="man.prolong">Match terminé en prolongation (le perdant obtient 1 point)</span></label>
     <div class="man-joueurs-titre" data-i18n="man.joueurs">Joueurs (optionnel — pour les stats)</div>
     <div id="man-joueurs"></div>
     <button class="btn-mini" onclick="ajouterLigneManuelle()" style="margin-top:6px" data-i18n="man.ajLigne">+ Ajouter un joueur</button>
@@ -616,9 +620,9 @@ const DICT = {
   'ea.aucunClub':'Aucune équipe n\'a d\'ID club EA. Ajoute-le dans la fiche de l\'équipe.','ea.chargement':'Connexion à EA… (10-20 sec)','ea.erreur':'Erreur de connexion à EA. Réessaie dans quelques minutes.','ea.matchsTrouves':'match(s) trouvé(s)','ea.pretsImport':'prêt(s) à importer','ea.horsLigue':'adversaire hors-tournoi','ea.nul':'égalité (ignoré)','ea.deja':'déjà importé','ea.nonRelies':'joueur(s) non reliés','ea.nouveaux':'nouveaux joueurs','ea.importEnCours':'Import en cours…','ea.rienCoche':'Coche au moins un match.','ea.fini':'{n} match(s) importé(s)! Les stats sont à jour.','ea.finiPlus':'{n} match(s) importé(s) · {j} joueur(s) créé(s)! Les stats sont à jour.',
   'me.titre':'Meilleurs pointeurs','me.joueur':'Joueur','me.equipe':'Équipe','me.b':'B','me.a':'A',
   'nav.stats':'Top Stats','ts.eyebrow':'Meneurs du tournoi','ts.titre':'Top Stats','ts.sous':'Les meilleurs patineurs et gardiens du tournoi.','ts.patineurs':'Patineurs','ts.gardiens':'Gardiens','ts.buteurs':'Top buteurs','ts.passeurs':'Top passeurs','ts.pointeurs':'Top pointeurs','ts.efficacite':'Efficacité (770 = .770)','ts.moyenne':'Moyenne (buts/match)','ts.victoires':'Victoires','ts.aucun':'—','ts.vide.t':'Aucune stat pour l\'instant','ts.vide.s':'Les stats apparaîtront après les premiers matchs importés.',
-  'nav.calendrier':'Calendrier','cal.eyebrow':'Horaire','cal.titre':'Calendrier','cal.sous':'Qui joue contre qui. Les scores s\'affichent une fois les matchs joués.','cal.adm':'Admin · Ajouter un match à l\'horaire','cal.admNote':'Crée les affrontements prévus. Ils se remplissent avec le score quand tu entres/importes le résultat.','cal.ajouter':'Ajouter au calendrier','cal.ph.heure':'Heure (ex. 20h00) — optionnel','man.titre':'Entrer le match manuellement','man.joueurs':'Joueurs (optionnel — pour les stats)','man.ajLigne':'+ Ajouter un joueur','man.enr':'Enregistrer le match','man.nomJoueur':'Nom / gamertag','man.patineur':'Patineur','man.gardien':'Gardien','man.buts':'Buts','man.passes':'Passes','man.points':'Points','man.tirs':'Tirs','man.arrets':'Arrêts','man.eff':'Eff.','man.besoinScore':'Entre les deux scores.','man.enrEnCours':'Enregistrement…','man.reset':'🗑️ Reset','man.resetConfirm':'Effacer le pointage et tous les joueurs de ce match ?','eqr.vide':'Aucun joueur avec des stats pour cette équipe pour l\'instant.','ts.moyPts':'Moyenne pts/match','ts.effCourt':'Eff.','ts.moyCourt':'Moy.','cal.vide.t':'Horaire à venir','cal.vide.s':'Les affrontements prévus apparaîtront ici.',
+  'nav.calendrier':'Calendrier','cal.eyebrow':'Horaire','cal.titre':'Calendrier','cal.sous':'Qui joue contre qui. Les scores s\'affichent une fois les matchs joués.','cal.adm':'Admin · Ajouter un match à l\'horaire','cal.admNote':'Crée les affrontements prévus. Ils se remplissent avec le score quand tu entres/importes le résultat.','cal.ajouter':'Ajouter au calendrier','cal.ph.heure':'Heure (ex. 20h00) — optionnel','man.titre':'Entrer le match manuellement','man.joueurs':'Joueurs (optionnel — pour les stats)','man.ajLigne':'+ Ajouter un joueur','man.enr':'Enregistrer le match','man.nomJoueur':'Nom / gamertag','man.patineur':'Patineur','man.gardien':'Gardien','man.buts':'Buts','man.passes':'Passes','man.points':'Points','man.tirs':'Tirs','man.arrets':'Arrêts','man.eff':'Eff.','man.besoinScore':'Entre les deux scores.','man.enrEnCours':'Enregistrement…','man.reset':'🗑️ Reset','man.resetConfirm':'Effacer complètement ce match (score + joueurs) ? Il disparaîtra du classement.','man.prolong':'Match terminé en prolongation (le perdant obtient 1 point)','eqr.vide':'Aucun joueur avec des stats pour cette équipe pour l\'instant.','ts.moyPts':'Moyenne pts/match','ts.effCourt':'Eff.','ts.moyCourt':'Moy.','cal.vide.t':'Horaire à venir','cal.vide.s':'Les affrontements prévus apparaîtront ici.',
   'po.poule':'Poule','po.tourNul':'Aucun tournoi','po.tourNul.s':'Crée un tournoi pour commencer.','po.eqVide':'Aucune équipe','po.eqVide.s':'Les équipes confirmées apparaîtront ici, réparties en poules.','po.3e':'Match pour la 3e place',
-  'col.eq':'Équipe','col.pj':'PJ','col.v':'V','col.d':'D','col.bp':'BP','col.bc':'BC','col.diff':'+/-','col.pts':'PTS',
+  'col.eq':'Équipe','col.pj':'PJ','col.v':'V','col.d':'DR','col.dp':'DP','col.bp':'BP','col.bc':'BC','col.diff':'+/-','col.pts':'PTS',
   'br.eyebrow':'La route vers la Coupe','br.titre':'Éliminatoires','br.sous':'Le tableau des séries. Le dernier debout soulève la Coupe.',
   'br.adm':'Admin · Ajouter un match de séries','br.quart':'Quart de finale','br.demi':'Demi-finale','br.petite':'Petite finale (3e place)','br.finale':'FINALE','br.ajouter':'Ajouter au tableau','br.ph.buts':'Buts (vide = à jouer)',
   'br.quarts':'Quarts de finale','br.demis':'Demi-finales','br.finaleT':'Finale','br.avenir':'À venir','br.acouronner':'À couronner','br.tbd':'À déterminer','br.entreScore':'Entre les deux scores.','br.pasEgalite':'Pas d\'égalité en séries — il faut un gagnant.','br.enr':'OK','br.effacer':'Effacer ce résultat ?','br.couronner':'🏆 Couronner champion','br.confirmCouronne':'Couronner cette équipe championne et terminer le tournoi ?',
@@ -653,9 +657,9 @@ const DICT = {
   'ea.aucunClub':'No team has an EA club ID. Add it in the team\'s details.','ea.chargement':'Connecting to EA… (10-20 sec)','ea.erreur':'EA connection error. Try again in a few minutes.','ea.matchsTrouves':'match(es) found','ea.pretsImport':'ready to import','ea.horsLigue':'opponent not in tournament','ea.nul':'tie (skipped)','ea.deja':'already imported','ea.nonRelies':'unlinked player(s)','ea.nouveaux':'new players','ea.importEnCours':'Importing…','ea.rienCoche':'Check at least one match.','ea.fini':'{n} match(es) imported! Stats are up to date.','ea.finiPlus':'{n} match(es) imported · {j} player(s) created! Stats are up to date.',
   'me.titre':'Top scorers','me.joueur':'Player','me.equipe':'Team','me.b':'G','me.a':'A',
   'nav.stats':'Top Stats','ts.eyebrow':'Tournament leaders','ts.titre':'Top Stats','ts.sous':'The tournament\'s best skaters and goalies.','ts.patineurs':'Skaters','ts.gardiens':'Goalies','ts.buteurs':'Top goal scorers','ts.passeurs':'Top playmakers','ts.pointeurs':'Top point leaders','ts.efficacite':'Save pct (770 = .770)','ts.moyenne':'GAA (goals/game)','ts.victoires':'Wins','ts.aucun':'—','ts.vide.t':'No stats yet','ts.vide.s':'Stats will appear after the first imported matches.',
-  'nav.calendrier':'Schedule','cal.eyebrow':'Schedule','cal.titre':'Schedule','cal.sous':'Who plays who. Scores show up once matches are played.','cal.adm':'Admin · Add a match to the schedule','cal.admNote':'Create the planned matchups. They fill in with the score when you enter/import the result.','cal.ajouter':'Add to schedule','cal.ph.heure':'Time (e.g. 8:00pm) — optional','man.titre':'Enter match manually','man.joueurs':'Players (optional — for stats)','man.ajLigne':'+ Add a player','man.enr':'Save match','man.nomJoueur':'Name / gamertag','man.patineur':'Skater','man.gardien':'Goalie','man.buts':'Goals','man.passes':'Assists','man.points':'Points','man.tirs':'Shots','man.arrets':'Saves','man.eff':'Sv','man.besoinScore':'Enter both scores.','man.enrEnCours':'Saving…','man.reset':'🗑️ Reset','man.resetConfirm':'Clear the score and all players for this match?','eqr.vide':'No players with stats for this team yet.','ts.moyPts':'Points/game avg','ts.effCourt':'Sv','ts.moyCourt':'GAA','cal.vide.t':'Schedule coming soon','cal.vide.s':'Planned matchups will appear here.',
+  'nav.calendrier':'Schedule','cal.eyebrow':'Schedule','cal.titre':'Schedule','cal.sous':'Who plays who. Scores show up once matches are played.','cal.adm':'Admin · Add a match to the schedule','cal.admNote':'Create the planned matchups. They fill in with the score when you enter/import the result.','cal.ajouter':'Add to schedule','cal.ph.heure':'Time (e.g. 8:00pm) — optional','man.titre':'Enter match manually','man.joueurs':'Players (optional — for stats)','man.ajLigne':'+ Add a player','man.enr':'Save match','man.nomJoueur':'Name / gamertag','man.patineur':'Skater','man.gardien':'Goalie','man.buts':'Goals','man.passes':'Assists','man.points':'Points','man.tirs':'Shots','man.arrets':'Saves','man.eff':'Sv','man.besoinScore':'Enter both scores.','man.enrEnCours':'Saving…','man.reset':'🗑️ Reset','man.resetConfirm':'Completely delete this match (score + players)? It will disappear from the standings.','man.prolong':'Match ended in overtime (loser gets 1 point)','eqr.vide':'No players with stats for this team yet.','ts.moyPts':'Points/game avg','ts.effCourt':'Sv','ts.moyCourt':'GAA','cal.vide.t':'Schedule coming soon','cal.vide.s':'Planned matchups will appear here.',
   'po.poule':'Group','po.tourNul':'No tournament','po.tourNul.s':'Create a tournament to get started.','po.eqVide':'No teams','po.eqVide.s':'Confirmed teams will appear here, split into groups.','po.3e':'Third-place match',
-  'col.eq':'Team','col.pj':'GP','col.v':'W','col.d':'L','col.bp':'GF','col.bc':'GA','col.diff':'+/-','col.pts':'PTS',
+  'col.eq':'Team','col.pj':'GP','col.v':'W','col.d':'RL','col.dp':'OTL','col.bp':'GF','col.bc':'GA','col.diff':'+/-','col.pts':'PTS',
   'br.eyebrow':'The road to the Cup','br.titre':'Playoffs','br.sous':'The playoff bracket. The last one standing lifts the Cup.',
   'br.adm':'Admin · Add a playoff match','br.quart':'Quarter-final','br.demi':'Semi-final','br.petite':'Third-place game','br.finale':'FINAL','br.ajouter':'Add to bracket','br.ph.buts':'Goals (empty = to play)',
   'br.quarts':'Quarter-finals','br.demis':'Semi-finals','br.finaleT':'Final','br.avenir':'TBD','br.acouronner':'To be crowned','br.tbd':'TBD','br.entreScore':'Enter both scores.','br.pasEgalite':'No ties in playoffs — need a winner.','br.enr':'OK','br.effacer':'Delete this result?','br.couronner':'🏆 Crown champion','br.confirmCouronne':'Crown this team champion and finish the tournament?',
@@ -920,9 +924,11 @@ function ouvrirMatchManuel(domId, extId){
   document.getElementById('man-statut').textContent='';
   // Pré-remplir si un match existe déjà entre ces 2 équipes
   const existant=matchPouleEntre(t.id, domId, extId);
+  const cp=document.getElementById('man-prolong'); if(cp) cp.checked=false;
   if(existant){
     document.getElementById('man-sd').value = (existant.domId===domId)?existant.scoreDom:existant.scoreExt;
     document.getElementById('man-se').value = (existant.domId===domId)?existant.scoreExt:existant.scoreDom;
+    if(cp) cp.checked = !!existant.prolongation;
     (existant.lignes||[]).forEach(l=>{
       const j = joueursDuTournoi(t.id).find(x=>x.id===l.pid);
       manLignes.push({ eqId:l.eqId, nom: j?j.nom:'', gardien:(l.tirs!==undefined),
@@ -992,11 +998,19 @@ function rendreLignesManuelles(){
 }
 function reinitialiserMatchManuel(){
   if(!confirm(T('man.resetConfirm'))) return;
+  const t=tournoiParId(tournoiActif);
+  // Efface le match sauvegardé entre ces 2 équipes (pour qu'il disparaisse du classement)
+  if(t && manDom && manExt){
+    const existant=matchPouleEntre(t.id, manDom.id, manExt.id);
+    if(existant){ db.collection('tMatchs').doc(existant.id).delete().catch(e=>alert(e.message)); }
+  }
   document.getElementById('man-sd').value='';
   document.getElementById('man-se').value='';
+  const cp=document.getElementById('man-prolong'); if(cp) cp.checked=false;
   manLignes=[];
   ajouterLigneManuelle();
-  document.getElementById('man-statut').innerHTML='';
+  rendreLignesManuelles();
+  fermerModale('modale-manuel');
 }
 
 /* Résumé d'une équipe : joueurs + stats (clic sur une équipe dans les poules) */
@@ -1069,10 +1083,11 @@ async function enregistrerMatchManuel(){
       else { lignes.push({pid, eqId:l.eqId, b:+l.b||0, a:+l.a||0}); }
     });
     // 3) Créer ou mettre à jour le match (phase poule)
+    const prolongation = !!(document.getElementById('man-prolong') && document.getElementById('man-prolong').checked);
     const existant=matchPouleEntre(t.id, manDom.id, manExt.id);
     const payload={tournoiId:t.id, phase:'poule', poule:(eqParId(equipesDuTournoi(t.id),manDom.id)||{}).poule||'A',
       domId:manDom.id, domNom:manDom.nom, extId:manExt.id, extNom:manExt.nom,
-      scoreDom:sd, scoreExt:se, joue:true, lignes:lignes};
+      scoreDom:sd, scoreExt:se, prolongation:prolongation, joue:true, lignes:lignes};
     if(existant){
       await db.collection('tMatchs').doc(existant.id).update(payload);
     } else {
@@ -1319,11 +1334,14 @@ async function confirmerImportEA(){
 /* Classement d'une poule */
 function classementPoule(tid, poule, eqs){
   const st={};
-  eqs.filter(e=>(e.poule||'A')===poule).forEach(e=>{ st[e.id]={id:e.id,nom:e.nom,couleur:e.couleur,pj:0,v:0,d:0,bp:0,bc:0,pts:0}; });
+  eqs.filter(e=>(e.poule||'A')===poule).forEach(e=>{ st[e.id]={id:e.id,nom:e.nom,couleur:e.couleur,pj:0,v:0,d:0,dp:0,bp:0,bc:0,pts:0}; });
   matchsDuTournoi(tid).filter(m=>m.phase==='poule' && m.joue && (m.poule||'A')===poule).forEach(m=>{
     const a=st[m.domId], b=st[m.extId]; if(!a||!b) return;
     a.pj++; b.pj++; a.bp+=+m.scoreDom; a.bc+=+m.scoreExt; b.bp+=+m.scoreExt; b.bc+=+m.scoreDom;
-    if(+m.scoreDom>+m.scoreExt){ a.v++; a.pts+=2; b.d++; } else if(+m.scoreExt>+m.scoreDom){ b.v++; b.pts+=2; a.d++; } else { a.pts++; b.pts++; }
+    const ot=!!m.prolongation;
+    if(+m.scoreDom>+m.scoreExt){ a.v++; a.pts+=2; if(ot){ b.dp++; b.pts+=1; } else b.d++; }
+    else if(+m.scoreExt>+m.scoreDom){ b.v++; b.pts+=2; if(ot){ a.dp++; a.pts+=1; } else a.d++; }
+    else { a.pts++; b.pts++; }
   });
   return Object.values(st).sort((x,y)=> y.pts-x.pts || (y.bp-y.bc)-(x.bp-x.bc) || y.bp-x.bp || x.nom.localeCompare(y.nom));
 }
@@ -1339,12 +1357,12 @@ function rendrePoules(){
     const cl=classementPoule(t.id,L,eqs);
     if(cl.length===0) return;
     html+='<div class="pool-titre">'+T('po.poule')+' '+L+'</div>';
-    html+='<div class="tbl-wrap"><table><thead><tr><th class="rang">#</th><th class="eq">'+T('col.eq')+'</th><th>'+T('col.pj')+'</th><th>'+T('col.v')+'</th><th>'+T('col.d')+'</th><th>'+T('col.bp')+'</th><th>'+T('col.bc')+'</th><th>'+T('col.diff')+'</th><th>'+T('col.pts')+'</th></tr></thead><tbody>';
+    html+='<div class="tbl-wrap"><table><thead><tr><th class="rang">#</th><th class="eq">'+T('col.eq')+'</th><th>'+T('col.pj')+'</th><th>'+T('col.v')+'</th><th>'+T('col.d')+'</th><th>'+T('col.dp')+'</th><th>'+T('col.bp')+'</th><th>'+T('col.bc')+'</th><th>'+T('col.diff')+'</th><th>'+T('col.pts')+'</th></tr></thead><tbody>';
     cl.forEach((s,i)=>{
       const q = i<4; // top 4 qualifiés pour les demi-finales (indicatif)
       html+='<tr class="'+(q?'q':'')+'"><td class="rang">'+(i+1)+'</td>'
         +'<td class="eq"><span class="eq-clic" onclick="ouvrirResumeEquipe(\''+s.id+'\')"><span class="pastille" style="background:'+(s.couleur||'#38C6E6')+'"></span>'+esc(s.nom)+'</span></td>'
-        +'<td>'+s.pj+'</td><td>'+s.v+'</td><td>'+s.d+'</td><td>'+s.bp+'</td><td>'+s.bc+'</td><td>'+((s.bp-s.bc>0?'+':'')+(s.bp-s.bc))+'</td><td class="pts">'+s.pts+'</td></tr>';
+        +'<td>'+s.pj+'</td><td>'+s.v+'</td><td>'+s.d+'</td><td>'+(s.dp||0)+'</td><td>'+s.bp+'</td><td>'+s.bc+'</td><td>'+((s.bp-s.bc>0?'+':'')+(s.bp-s.bc))+'</td><td class="pts">'+s.pts+'</td></tr>';
     });
     html+='</tbody></table></div>';
     // matchs de la poule
@@ -1457,7 +1475,7 @@ function classementGlobal(tid, eqs){
   matchsDuTournoi(tid).filter(m=>m.phase==='poule' && m.joue).forEach(m=>{
     const a=st[m.domId], b=st[m.extId]; if(!a||!b) return;
     a.pj++; b.pj++; a.bp+=+m.scoreDom; a.bc+=+m.scoreExt; b.bp+=+m.scoreExt; b.bc+=+m.scoreDom;
-    if(+m.scoreDom>+m.scoreExt){ a.pts+=2; } else if(+m.scoreExt>+m.scoreDom){ b.pts+=2; } else { a.pts++; b.pts++; }
+    if(+m.scoreDom>+m.scoreExt){ a.pts+=2; if(m.prolongation) b.pts+=1; } else if(+m.scoreExt>+m.scoreDom){ b.pts+=2; if(m.prolongation) a.pts+=1; } else { a.pts++; b.pts++; }
   });
   return Object.values(st).sort((x,y)=> y.pts-x.pts || (y.bp-y.bc)-(x.bp-x.bc) || y.bp-x.bp || (x.nom||'').localeCompare(y.nom||''));
 }
