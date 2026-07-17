@@ -271,6 +271,7 @@ footer a{color:var(--cyan);text-decoration:none}
       <a class="nav-link" data-route="tournois" href="#tournois" data-i18n="nav.tournois">Tournois</a>
       <a class="nav-link" data-route="inscriptions" href="#inscriptions" data-i18n="nav.inscriptions">Inscriptions</a>
       <a class="nav-link" data-route="poules" href="#poules" data-i18n="nav.poules">Poules</a>
+      <a class="nav-link" data-route="calendrier" href="#calendrier" data-i18n="nav.calendrier">Calendrier</a>
       <a class="nav-link" data-route="bracket" href="#bracket" data-i18n="nav.bracket">Éliminatoires</a>
       <a class="nav-link" data-route="champions" href="#champions" data-i18n="nav.champions">Champions</a>
     </nav>
@@ -394,6 +395,22 @@ footer a{color:var(--cyan);text-decoration:none}
     </div>
     <div id="poules-contenu"></div>
     <div id="meneurs-contenu"></div>
+  </section>
+
+  <!-- CALENDRIER -->
+  <section class="page" id="calendrier">
+    <div class="page-head"><div class="eyebrow" data-i18n="cal.eyebrow">Horaire</div><h2 data-i18n="cal.titre">Calendrier</h2><p data-i18n="cal.sous">Qui joue contre qui. Les scores s'affichent une fois les matchs joués.</p></div>
+    <div class="select-tournoi"><label data-i18n="commun.tournoi">Tournoi</label><select id="cal-select" onchange="changerTournoiActif(this.value)"></select></div>
+    <div class="admin-panel admin-only">
+      <div class="lbl" data-i18n="cal.adm">Admin · Ajouter un match à l'horaire</div>
+      <p style="color:var(--argent);font-size:12.5px;margin-bottom:10px" data-i18n="cal.admNote">Crée les affrontements prévus. Ils se remplissent avec le score quand tu entres/importes le résultat.</p>
+      <div class="deux-cols">
+        <select id="cal-dom"></select>
+        <select id="cal-ext"></select>
+      </div>
+      <button class="btn btn-cyan" onclick="ajouterAuCalendrier()" data-i18n="cal.ajouter">Ajouter au calendrier</button>
+    </div>
+    <div id="calendrier-contenu"></div>
   </section>
 
   <!-- BRACKET -->
@@ -520,6 +537,7 @@ const DICT = {
   'ea.adm':'Admin · Import EA (matchs privés de club)','ea.admNote':'Va chercher les derniers matchs privés d\'une équipe qui a un ID club EA. Relie les joueurs par gamertag.','ea.btn':'📥 Importer depuis EA','ea.titre':'Importer depuis EA','ea.choisir':'Choisis une équipe (qui a un ID club EA) pour aller chercher ses derniers matchs privés de club.','ea.equipe':'Équipe à importer','ea.chercher':'Chercher les matchs','ea.confirmer':'Importer les matchs cochés',
   'ea.aucunClub':'Aucune équipe n\'a d\'ID club EA. Ajoute-le dans la fiche de l\'équipe.','ea.chargement':'Connexion à EA… (10-20 sec)','ea.erreur':'Erreur de connexion à EA. Réessaie dans quelques minutes.','ea.matchsTrouves':'match(s) trouvé(s)','ea.pretsImport':'prêt(s) à importer','ea.horsLigue':'adversaire hors-tournoi','ea.nul':'égalité (ignoré)','ea.deja':'déjà importé','ea.nonRelies':'joueur(s) non reliés','ea.rienCoche':'Coche au moins un match.','ea.fini':'{n} match(s) importé(s)! Les stats sont à jour.',
   'me.titre':'Meilleurs pointeurs','me.joueur':'Joueur','me.equipe':'Équipe','me.b':'B','me.a':'A',
+  'nav.calendrier':'Calendrier','cal.eyebrow':'Horaire','cal.titre':'Calendrier','cal.sous':'Qui joue contre qui. Les scores s\'affichent une fois les matchs joués.','cal.adm':'Admin · Ajouter un match à l\'horaire','cal.admNote':'Crée les affrontements prévus. Ils se remplissent avec le score quand tu entres/importes le résultat.','cal.ajouter':'Ajouter au calendrier','cal.vide.t':'Horaire à venir','cal.vide.s':'Les affrontements prévus apparaîtront ici.',
   'po.poule':'Poule','po.tourNul':'Aucun tournoi','po.tourNul.s':'Crée un tournoi pour commencer.','po.eqVide':'Aucune équipe','po.eqVide.s':'Les équipes confirmées apparaîtront ici, réparties en poules.','po.3e':'Match pour la 3e place',
   'col.eq':'Équipe','col.pj':'PJ','col.v':'V','col.d':'D','col.bp':'BP','col.bc':'BC','col.diff':'+/-','col.pts':'PTS',
   'br.eyebrow':'La route vers la Coupe','br.titre':'Éliminatoires','br.sous':'Le tableau des séries. Le dernier debout soulève la Coupe.',
@@ -555,6 +573,7 @@ const DICT = {
   'ea.adm':'Admin · EA Import (private club matches)','ea.admNote':'Fetches the latest private matches of a team that has an EA club ID. Links players by gamertag.','ea.btn':'📥 Import from EA','ea.titre':'Import from EA','ea.choisir':'Pick a team (with an EA club ID) to fetch its latest private club matches.','ea.equipe':'Team to import','ea.chercher':'Find matches','ea.confirmer':'Import checked matches',
   'ea.aucunClub':'No team has an EA club ID. Add it in the team\'s details.','ea.chargement':'Connecting to EA… (10-20 sec)','ea.erreur':'EA connection error. Try again in a few minutes.','ea.matchsTrouves':'match(es) found','ea.pretsImport':'ready to import','ea.horsLigue':'opponent not in tournament','ea.nul':'tie (skipped)','ea.deja':'already imported','ea.nonRelies':'unlinked player(s)','ea.rienCoche':'Check at least one match.','ea.fini':'{n} match(es) imported! Stats are up to date.',
   'me.titre':'Top scorers','me.joueur':'Player','me.equipe':'Team','me.b':'G','me.a':'A',
+  'nav.calendrier':'Schedule','cal.eyebrow':'Schedule','cal.titre':'Schedule','cal.sous':'Who plays who. Scores show up once matches are played.','cal.adm':'Admin · Add a match to the schedule','cal.admNote':'Create the planned matchups. They fill in with the score when you enter/import the result.','cal.ajouter':'Add to schedule','cal.vide.t':'Schedule coming soon','cal.vide.s':'Planned matchups will appear here.',
   'po.poule':'Group','po.tourNul':'No tournament','po.tourNul.s':'Create a tournament to get started.','po.eqVide':'No teams','po.eqVide.s':'Confirmed teams will appear here, split into groups.','po.3e':'Third-place match',
   'col.eq':'Team','col.pj':'GP','col.v':'W','col.d':'L','col.bp':'GF','col.bc':'GA','col.diff':'+/-','col.pts':'PTS',
   'br.eyebrow':'The road to the Cup','br.titre':'Playoffs','br.sous':'The playoff bracket. The last one standing lifts the Cup.',
@@ -581,7 +600,7 @@ function basculerLangue(){ langue = (langue==='fr'?'en':'fr'); localStorage.setI
 /* ===================== ÉTAT ===================== */
 let estAdmin = false;
 let tournoiActif = null;              // id du tournoi sélectionné
-let snapTournois=null, snapEquipes=null, snapMatchs=null, snapInsc=null, snapJoueurs=null;
+let snapTournois=null, snapEquipes=null, snapMatchs=null, snapInsc=null, snapJoueurs=null, snapCal=null;
 
 /* ===================== ADMIN ===================== */
 function ouvrirLogin(){ document.getElementById('modale-login').classList.add('open'); document.getElementById('login-err').style.display='none'; }
@@ -597,7 +616,7 @@ function appliquerRoles(){ document.body.classList.toggle('is-admin', estAdmin);
 function fermerModale(id){ document.getElementById(id).classList.remove('open'); }
 
 /* ===================== ROUTEUR ===================== */
-const ROUTES=['accueil','tournois','inscriptions','poules','bracket','champions'];
+const ROUTES=['accueil','tournois','inscriptions','poules','calendrier','bracket','champions'];
 function afficherRoute(){
   let h=(location.hash||'#accueil').slice(1);
   if(!ROUTES.includes(h)) h='accueil';
@@ -624,6 +643,7 @@ function init(){
   db.collection('tEquipes').onSnapshot(s=>{snapEquipes=s; rafraichir();}, e=>console.warn(e));
   db.collection('tMatchs').onSnapshot(s=>{snapMatchs=s; rafraichir();}, e=>console.warn(e));
   db.collection('tJoueurs').onSnapshot(s=>{snapJoueurs=s; rafraichir();}, e=>console.warn(e));
+  db.collection('tCalendrier').onSnapshot(s=>{snapCal=s; rafraichir();}, e=>console.warn(e));
   db.collection('tInscriptions').orderBy('createdAt','desc').onSnapshot(s=>{snapInsc=s; rafraichir();}, e=>console.warn(e));
 }
 
@@ -635,7 +655,7 @@ function rafraichir(){
     snapTournois.forEach(d=>{ const t=d.data(); if(!premier) premier=d.id; if(!choix && t.statut!=='termine') choix=d.id; });
     tournoiActif = choix || premier;
   }
-  rendreTournois(); rendreVedette(); rendreSelects(); rendrePoules(); rendreBracket(); rendreChampions(); rendreInscriptionsAdmin(); rendreSelectInscription();
+  rendreTournois(); rendreVedette(); rendreSelects(); rendrePoules(); rendreCalendrier(); rendreBracket(); rendreChampions(); rendreInscriptionsAdmin(); rendreSelectInscription();
 }
 
 /* ===================== TOURNOIS ===================== */
@@ -722,7 +742,7 @@ function rendreVedette(){
 
 /* ===================== SELECTS (poules/bracket + admin) ===================== */
 function rendreSelects(){
-  ['poules-select','bracket-select'].forEach(id=>{
+  ['poules-select','bracket-select','cal-select'].forEach(id=>{
     const s=document.getElementById(id); if(!s) return;
     let html='';
     snapTournois.forEach(d=>{ const t=d.data(); html+='<option value="'+d.id+'"'+(d.id===tournoiActif?' selected':'')+'>'+esc(t.nom)+'</option>'; });
@@ -735,9 +755,52 @@ function rendreSelects(){
   // selects de match (poule + bracket) avec équipes du tournoi
   const eqs=t?equipesDuTournoi(t.id):[];
   const opt='<option value="">— équipe —</option>'+eqs.map(e=>'<option value="'+e.id+'">'+esc(e.nom)+'</option>').join('');
-  ['mp-dom','mp-ext','mb-dom','mb-ext','jo-equipe'].forEach(id=>{ const s=document.getElementById(id); if(s) s.innerHTML=opt; });
+  ['mp-dom','mp-ext','mb-dom','mb-ext','jo-equipe','cal-dom','cal-ext'].forEach(id=>{ const s=document.getElementById(id); if(s) s.innerHTML=opt; });
 }
 function changerTournoiActif(id){ tournoiActif=id; rafraichir(); }
+
+/* ===================== CALENDRIER (matchups prévus) ===================== */
+function ajouterAuCalendrier(){
+  const t=tournoiParId(tournoiActif); if(!t){ alert('Choisis un tournoi.'); return; }
+  const domId=document.getElementById('cal-dom').value, extId=document.getElementById('cal-ext').value;
+  if(!domId||!extId||domId===extId){ alert('Choisis deux équipes différentes.'); return; }
+  const eqs=equipesDuTournoi(t.id); const dom=eqParId(eqs,domId), ext=eqParId(eqs,extId);
+  db.collection('tCalendrier').add({tournoiId:t.id, domId, domNom:dom.nom, extId, extNom:ext.nom,
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(e=>alert(e.message));
+}
+function supprimerCalendrier(id){ if(confirm('Retirer ce match de l\'horaire ?')) db.collection('tCalendrier').doc(id).delete().catch(e=>alert(e.message)); }
+function calDuTournoi(tid){ const a=[]; if(snapCal) snapCal.forEach(d=>{const c=d.data(); if(c.tournoiId===tid) a.push({id:d.id,...c});}); return a; }
+
+/* Cherche un match JOUÉ entre 2 équipes (peu importe l'ordre) */
+function scoreEntre(tid, aId, bId){
+  let r=null;
+  if(snapMatchs) snapMatchs.forEach(d=>{ const m=d.data(); if(m.tournoiId!==tid||!m.joue) return;
+    if((m.domId===aId&&m.extId===bId)){ r={sdA:+m.scoreDom, sdB:+m.scoreExt}; }
+    else if((m.domId===bId&&m.extId===aId)){ r={sdA:+m.scoreExt, sdB:+m.scoreDom}; }
+  });
+  return r;
+}
+function rendreCalendrier(){
+  const cont=document.getElementById('calendrier-contenu'); if(!cont) return;
+  const t=tournoiParId(tournoiActif);
+  if(!t){ cont.innerHTML=videHTML('📅',T('po.tourNul'),''); return; }
+  const cal=calDuTournoi(t.id);
+  if(cal.length===0){ cont.innerHTML=videHTML('📅',T('cal.vide.t'),T('cal.vide.s')); return; }
+  let html='<div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">';
+  cal.forEach(c=>{
+    const sc=scoreEntre(t.id, c.domId, c.extId);
+    const joue = !!sc;
+    const dg=joue&&sc.sdA>sc.sdB, eg=joue&&sc.sdB>sc.sdA;
+    html+='<div class="match-l'+(joue?'':' avenir')+'">'
+      +'<div class="e d"><span class="'+(dg?'gagne':'')+'">'+esc(c.domNom)+'</span></div>'
+      +'<div class="sc">'+(joue?('<span class="'+(dg?'gagne':'')+'">'+sc.sdA+'</span><small>–</small><span class="'+(eg?'gagne':'')+'">'+sc.sdB+'</span>'):'VS')+'</div>'
+      +'<div class="e"><span class="'+(eg?'gagne':'')+'">'+esc(c.extNom)+'</span></div>'
+      + (estAdmin?'<button class="del-btn admin-only inline" style="flex:none" onclick="supprimerCalendrier(\''+c.id+'\')">✕</button>':'')
+      +'</div>';
+  });
+  html+='</div>';
+  cont.innerHTML=html;
+}
 
 /* ===================== ÉQUIPES ===================== */
 function ajouterEquipe(){
@@ -962,7 +1025,7 @@ function rendrePoules(){
     html+='<div class="pool-titre">'+T('po.poule')+' '+L+'</div>';
     html+='<div class="tbl-wrap"><table><thead><tr><th class="rang">#</th><th class="eq">'+T('col.eq')+'</th><th>'+T('col.pj')+'</th><th>'+T('col.v')+'</th><th>'+T('col.d')+'</th><th>'+T('col.bp')+'</th><th>'+T('col.bc')+'</th><th>'+T('col.diff')+'</th><th>'+T('col.pts')+'</th></tr></thead><tbody>';
     cl.forEach((s,i)=>{
-      const q = i<2; // top 2 qualifiés (indicatif)
+      const q = i<4; // top 4 qualifiés pour les demi-finales (indicatif)
       html+='<tr class="'+(q?'q':'')+'"><td class="rang">'+(i+1)+'</td>'
         +'<td class="eq"><span class="pastille" style="background:'+(s.couleur||'#38C6E6')+'"></span>'+esc(s.nom)+'</td>'
         +'<td>'+s.pj+'</td><td>'+s.v+'</td><td>'+s.d+'</td><td>'+s.bp+'</td><td>'+s.bc+'</td><td>'+((s.bp-s.bc>0?'+':'')+(s.bp-s.bc))+'</td><td class="pts">'+s.pts+'</td></tr>';
