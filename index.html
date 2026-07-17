@@ -177,6 +177,19 @@ tr.q td.eq::after{content:' ✓';color:var(--vert);font-size:11px}
   font-family:'Bebas Neue',sans-serif;font-size:14px;display:flex;align-items:center;justify-content:center}
 .cal-heure{flex:none;font-size:11.5px;font-weight:600;color:var(--argent);letter-spacing:.03em;
   background:rgba(120,160,190,.08);border:1px solid var(--bordure);border-radius:99px;padding:3px 9px;white-space:nowrap}
+.man-entete{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;text-align:center;color:var(--cyan);margin-bottom:14px}
+.man-scores{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;margin-bottom:16px}
+.man-joueurs-titre{font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--argent);margin:6px 0 10px}
+.man-ligne{background:var(--acier2);border:1px solid var(--bordure);border-radius:10px;padding:10px;margin-bottom:8px;
+  display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center}
+.man-ligne select,.man-ligne input{margin:0;padding:8px 9px;font-size:13px}
+.man-ligne .del-btn{padding:8px 10px;grid-row:1}
+.man-stats-mini{grid-column:1/3;display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.man-stats-mini label{display:flex;flex-direction:column;font-size:11px;color:var(--argent);gap:3px;flex:1;min-width:70px}
+.man-stats-mini input{margin:0;padding:7px 8px;text-align:center}
+.man-calc{font-size:12px;color:var(--argent);align-self:center;white-space:nowrap}
+.man-calc b{color:var(--cyan);font-family:'Bebas Neue',sans-serif;font-size:18px}
+@media(max-width:560px){.man-ligne{grid-template-columns:1fr auto}.man-stats-mini{grid-column:1/3}}
 @media(max-width:560px){.cal-heure{display:none}}
 
 /* ---------- Bracket ---------- */
@@ -515,6 +528,27 @@ footer a{color:var(--cyan);text-decoration:none}
   </div>
 </div>
 
+<!-- MODALE SAISIE MANUELLE D'UN MATCH -->
+<div class="modal" id="modale-manuel">
+  <div class="modal-box" style="max-width:600px;text-align:left">
+    <h3>✏️ <span data-i18n="man.titre">Entrer le match manuellement</span></h3>
+    <div id="man-entete" class="man-entete"></div>
+    <div class="man-scores">
+      <div><label class="champ-lbl" id="man-lbl-dom"></label><input id="man-sd" type="number" min="0" placeholder="0"></div>
+      <div style="align-self:center;color:var(--argent2);font-family:'Bebas Neue',sans-serif;font-size:22px">–</div>
+      <div><label class="champ-lbl" id="man-lbl-ext"></label><input id="man-se" type="number" min="0" placeholder="0"></div>
+    </div>
+    <div class="man-joueurs-titre" data-i18n="man.joueurs">Joueurs (optionnel — pour les stats)</div>
+    <div id="man-joueurs"></div>
+    <button class="btn-mini" onclick="ajouterLigneManuelle()" style="margin-top:6px" data-i18n="man.ajLigne">+ Ajouter un joueur</button>
+    <div class="cta-row" style="margin-top:16px">
+      <button class="btn btn-cyan" onclick="enregistrerMatchManuel()" data-i18n="man.enr">Enregistrer le match</button>
+      <button class="btn btn-ghost" onclick="fermerModale('modale-manuel')" data-i18n="commun.annuler">Annuler</button>
+    </div>
+    <div id="man-statut" style="margin-top:10px;font-size:13px"></div>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
@@ -563,8 +597,8 @@ const DICT = {
   'ea.adm':'Admin · Import EA (matchs privés de club)','ea.admNote':'Va chercher les derniers matchs privés d\'une équipe qui a un ID club EA. Relie les joueurs par gamertag.','ea.btn':'📥 Importer depuis EA','ea.titre':'Importer depuis EA','ea.choisir':'Choisis une équipe (qui a un ID club EA) pour aller chercher ses derniers matchs privés de club.','ea.equipe':'Équipe à importer','ea.chercher':'Chercher les matchs','ea.confirmer':'Importer les matchs cochés',
   'ea.aucunClub':'Aucune équipe n\'a d\'ID club EA. Ajoute-le dans la fiche de l\'équipe.','ea.chargement':'Connexion à EA… (10-20 sec)','ea.erreur':'Erreur de connexion à EA. Réessaie dans quelques minutes.','ea.matchsTrouves':'match(s) trouvé(s)','ea.pretsImport':'prêt(s) à importer','ea.horsLigue':'adversaire hors-tournoi','ea.nul':'égalité (ignoré)','ea.deja':'déjà importé','ea.nonRelies':'joueur(s) non reliés','ea.nouveaux':'nouveaux joueurs','ea.importEnCours':'Import en cours…','ea.rienCoche':'Coche au moins un match.','ea.fini':'{n} match(s) importé(s)! Les stats sont à jour.','ea.finiPlus':'{n} match(s) importé(s) · {j} joueur(s) créé(s)! Les stats sont à jour.',
   'me.titre':'Meilleurs pointeurs','me.joueur':'Joueur','me.equipe':'Équipe','me.b':'B','me.a':'A',
-  'nav.stats':'Top Stats','ts.eyebrow':'Meneurs du tournoi','ts.titre':'Top Stats','ts.sous':'Les meilleurs patineurs et gardiens du tournoi.','ts.patineurs':'Patineurs','ts.gardiens':'Gardiens','ts.buteurs':'Top buteurs','ts.passeurs':'Top passeurs','ts.pointeurs':'Top pointeurs','ts.efficacite':'% Efficacité','ts.moyenne':'Moyenne (buts/match)','ts.victoires':'Victoires','ts.aucun':'—','ts.vide.t':'Aucune stat pour l\'instant','ts.vide.s':'Les stats apparaîtront après les premiers matchs importés.',
-  'nav.calendrier':'Calendrier','cal.eyebrow':'Horaire','cal.titre':'Calendrier','cal.sous':'Qui joue contre qui. Les scores s\'affichent une fois les matchs joués.','cal.adm':'Admin · Ajouter un match à l\'horaire','cal.admNote':'Crée les affrontements prévus. Ils se remplissent avec le score quand tu entres/importes le résultat.','cal.ajouter':'Ajouter au calendrier','cal.ph.heure':'Heure (ex. 20h00) — optionnel','cal.vide.t':'Horaire à venir','cal.vide.s':'Les affrontements prévus apparaîtront ici.',
+  'nav.stats':'Top Stats','ts.eyebrow':'Meneurs du tournoi','ts.titre':'Top Stats','ts.sous':'Les meilleurs patineurs et gardiens du tournoi.','ts.patineurs':'Patineurs','ts.gardiens':'Gardiens','ts.buteurs':'Top buteurs','ts.passeurs':'Top passeurs','ts.pointeurs':'Top pointeurs','ts.efficacite':'Efficacité (770 = .770)','ts.moyenne':'Moyenne (buts/match)','ts.victoires':'Victoires','ts.aucun':'—','ts.vide.t':'Aucune stat pour l\'instant','ts.vide.s':'Les stats apparaîtront après les premiers matchs importés.',
+  'nav.calendrier':'Calendrier','cal.eyebrow':'Horaire','cal.titre':'Calendrier','cal.sous':'Qui joue contre qui. Les scores s\'affichent une fois les matchs joués.','cal.adm':'Admin · Ajouter un match à l\'horaire','cal.admNote':'Crée les affrontements prévus. Ils se remplissent avec le score quand tu entres/importes le résultat.','cal.ajouter':'Ajouter au calendrier','cal.ph.heure':'Heure (ex. 20h00) — optionnel','man.titre':'Entrer le match manuellement','man.joueurs':'Joueurs (optionnel — pour les stats)','man.ajLigne':'+ Ajouter un joueur','man.enr':'Enregistrer le match','man.nomJoueur':'Nom / gamertag','man.patineur':'Patineur','man.gardien':'Gardien','man.buts':'Buts','man.passes':'Passes','man.points':'Points','man.tirs':'Tirs','man.arrets':'Arrêts','man.eff':'Eff.','man.besoinScore':'Entre les deux scores.','man.enrEnCours':'Enregistrement…','cal.vide.t':'Horaire à venir','cal.vide.s':'Les affrontements prévus apparaîtront ici.',
   'po.poule':'Poule','po.tourNul':'Aucun tournoi','po.tourNul.s':'Crée un tournoi pour commencer.','po.eqVide':'Aucune équipe','po.eqVide.s':'Les équipes confirmées apparaîtront ici, réparties en poules.','po.3e':'Match pour la 3e place',
   'col.eq':'Équipe','col.pj':'PJ','col.v':'V','col.d':'D','col.bp':'BP','col.bc':'BC','col.diff':'+/-','col.pts':'PTS',
   'br.eyebrow':'La route vers la Coupe','br.titre':'Éliminatoires','br.sous':'Le tableau des séries. Le dernier debout soulève la Coupe.',
@@ -600,8 +634,8 @@ const DICT = {
   'ea.adm':'Admin · EA Import (private club matches)','ea.admNote':'Fetches the latest private matches of a team that has an EA club ID. Links players by gamertag.','ea.btn':'📥 Import from EA','ea.titre':'Import from EA','ea.choisir':'Pick a team (with an EA club ID) to fetch its latest private club matches.','ea.equipe':'Team to import','ea.chercher':'Find matches','ea.confirmer':'Import checked matches',
   'ea.aucunClub':'No team has an EA club ID. Add it in the team\'s details.','ea.chargement':'Connecting to EA… (10-20 sec)','ea.erreur':'EA connection error. Try again in a few minutes.','ea.matchsTrouves':'match(es) found','ea.pretsImport':'ready to import','ea.horsLigue':'opponent not in tournament','ea.nul':'tie (skipped)','ea.deja':'already imported','ea.nonRelies':'unlinked player(s)','ea.nouveaux':'new players','ea.importEnCours':'Importing…','ea.rienCoche':'Check at least one match.','ea.fini':'{n} match(es) imported! Stats are up to date.','ea.finiPlus':'{n} match(es) imported · {j} player(s) created! Stats are up to date.',
   'me.titre':'Top scorers','me.joueur':'Player','me.equipe':'Team','me.b':'G','me.a':'A',
-  'nav.stats':'Top Stats','ts.eyebrow':'Tournament leaders','ts.titre':'Top Stats','ts.sous':'The tournament\'s best skaters and goalies.','ts.patineurs':'Skaters','ts.gardiens':'Goalies','ts.buteurs':'Top goal scorers','ts.passeurs':'Top playmakers','ts.pointeurs':'Top point leaders','ts.efficacite':'Save %','ts.moyenne':'GAA (goals/game)','ts.victoires':'Wins','ts.aucun':'—','ts.vide.t':'No stats yet','ts.vide.s':'Stats will appear after the first imported matches.',
-  'nav.calendrier':'Schedule','cal.eyebrow':'Schedule','cal.titre':'Schedule','cal.sous':'Who plays who. Scores show up once matches are played.','cal.adm':'Admin · Add a match to the schedule','cal.admNote':'Create the planned matchups. They fill in with the score when you enter/import the result.','cal.ajouter':'Add to schedule','cal.ph.heure':'Time (e.g. 8:00pm) — optional','cal.vide.t':'Schedule coming soon','cal.vide.s':'Planned matchups will appear here.',
+  'nav.stats':'Top Stats','ts.eyebrow':'Tournament leaders','ts.titre':'Top Stats','ts.sous':'The tournament\'s best skaters and goalies.','ts.patineurs':'Skaters','ts.gardiens':'Goalies','ts.buteurs':'Top goal scorers','ts.passeurs':'Top playmakers','ts.pointeurs':'Top point leaders','ts.efficacite':'Save pct (770 = .770)','ts.moyenne':'GAA (goals/game)','ts.victoires':'Wins','ts.aucun':'—','ts.vide.t':'No stats yet','ts.vide.s':'Stats will appear after the first imported matches.',
+  'nav.calendrier':'Schedule','cal.eyebrow':'Schedule','cal.titre':'Schedule','cal.sous':'Who plays who. Scores show up once matches are played.','cal.adm':'Admin · Add a match to the schedule','cal.admNote':'Create the planned matchups. They fill in with the score when you enter/import the result.','cal.ajouter':'Add to schedule','cal.ph.heure':'Time (e.g. 8:00pm) — optional','man.titre':'Enter match manually','man.joueurs':'Players (optional — for stats)','man.ajLigne':'+ Add a player','man.enr':'Save match','man.nomJoueur':'Name / gamertag','man.patineur':'Skater','man.gardien':'Goalie','man.buts':'Goals','man.passes':'Assists','man.points':'Points','man.tirs':'Shots','man.arrets':'Saves','man.eff':'Sv','man.besoinScore':'Enter both scores.','man.enrEnCours':'Saving…','cal.vide.t':'Schedule coming soon','cal.vide.s':'Planned matchups will appear here.',
   'po.poule':'Group','po.tourNul':'No tournament','po.tourNul.s':'Create a tournament to get started.','po.eqVide':'No teams','po.eqVide.s':'Confirmed teams will appear here, split into groups.','po.3e':'Third-place match',
   'col.eq':'Team','col.pj':'GP','col.v':'W','col.d':'L','col.bp':'GF','col.bc':'GA','col.diff':'+/-','col.pts':'PTS',
   'br.eyebrow':'The road to the Cup','br.titre':'Playoffs','br.sous':'The playoff bracket. The last one standing lifts the Cup.',
@@ -844,11 +878,140 @@ function rendreCalendrier(){
       +'<div class="e d"><span class="'+(dg?'gagne':'')+'">'+esc(c.domNom)+'</span></div>'
       +'<div class="sc">'+(joue?('<span class="'+(dg?'gagne':'')+'">'+sc.sdA+'</span><small>–</small><span class="'+(eg?'gagne':'')+'">'+sc.sdB+'</span>'):'VS')+'</div>'
       +'<div class="e"><span class="'+(eg?'gagne':'')+'">'+esc(c.extNom)+'</span></div>'
+      + (estAdmin?'<button class="btn-mini admin-only inline" style="flex:none" onclick="ouvrirMatchManuel(\''+c.domId+'\',\''+c.extId+'\')">✏️</button>':'')
       + (estAdmin?'<button class="del-btn admin-only inline" style="flex:none" onclick="supprimerCalendrier(\''+c.id+'\')">✕</button>':'')
       +'</div>';
   });
   html+='</div>';
   cont.innerHTML=html;
+}
+
+/* ===================== SAISIE MANUELLE D'UN MATCH ===================== */
+let manDom=null, manExt=null, manLignes=[];
+
+function ouvrirMatchManuel(domId, extId){
+  const t=tournoiParId(tournoiActif); if(!t) return;
+  const eqs=equipesDuTournoi(t.id);
+  const eqD=eqParId(eqs,domId), eqE=eqParId(eqs,extId);
+  if(!eqD||!eqE) return;
+  const domNom=eqD.nom, extNom=eqE.nom;
+  manDom={id:domId, nom:domNom}; manExt={id:extId, nom:extNom}; manLignes=[];
+  document.getElementById('man-entete').textContent = domNom+'  vs  '+extNom;
+  document.getElementById('man-lbl-dom').textContent = domNom;
+  document.getElementById('man-lbl-ext').textContent = extNom;
+  document.getElementById('man-statut').textContent='';
+  // Pré-remplir si un match existe déjà entre ces 2 équipes
+  const existant=matchPouleEntre(t.id, domId, extId);
+  if(existant){
+    document.getElementById('man-sd').value = (existant.domId===domId)?existant.scoreDom:existant.scoreExt;
+    document.getElementById('man-se').value = (existant.domId===domId)?existant.scoreExt:existant.scoreDom;
+    (existant.lignes||[]).forEach(l=>{
+      const j = joueursDuTournoi(t.id).find(x=>x.id===l.pid);
+      manLignes.push({ eqId:l.eqId, nom: j?j.nom:'', gardien:(l.tirs!==undefined),
+        b:l.b||0, a:l.a||0, tirs:l.tirs||0, arr:l.arr||0 });
+    });
+  } else {
+    document.getElementById('man-sd').value=''; document.getElementById('man-se').value='';
+  }
+  if(manLignes.length===0) ajouterLigneManuelle();
+  rendreLignesManuelles();
+  document.getElementById('modale-manuel').classList.add('open');
+}
+function matchPouleEntre(tid, aId, bId){
+  let r=null;
+  if(snapMatchs) snapMatchs.forEach(d=>{ const m=d.data(); if(m.tournoiId!==tid||m.phase!=='poule') return;
+    if((m.domId===aId&&m.extId===bId)||(m.domId===bId&&m.extId===aId)) r={id:d.id,...m};
+  });
+  return r;
+}
+function ajouterLigneManuelle(){ manLignes.push({eqId:manDom?manDom.id:'', nom:'', gardien:false, b:0,a:0,tirs:0,arr:0}); rendreLignesManuelles(); }
+function retirerLigneManuelle(i){ manLignes.splice(i,1); rendreLignesManuelles(); }
+function majLigneManuelle(i,champ,val){
+  if(!manLignes[i]) return;
+  if(champ==='gardien'){ manLignes[i].gardien = (val==='1'||val===true); rendreLignesManuelles(); return; }
+  else if(champ==='eqId'||champ==='nom') manLignes[i][champ]=val;
+  else manLignes[i][champ]=Math.max(0, parseInt(val)||0);
+  // Mise à jour en direct du calcul (points ou efficacité) sans redessiner
+  const l=manLignes[i]; const span=document.getElementById('man-calc-'+i);
+  if(span){
+    if(l.gardien){ const eff=(l.tirs>0)?((l.arr/l.tirs)*1000).toFixed(0):'—'; span.innerHTML=T('man.eff')+': <b>'+eff+'</b>'; }
+    else { span.innerHTML=T('man.points')+': <b>'+((+l.b||0)+(+l.a||0))+'</b>'; }
+  }
+}
+function rendreLignesManuelles(){
+  const cont=document.getElementById('man-joueurs'); if(!cont) return;
+  let html='';
+  manLignes.forEach((l,i)=>{
+    const pts=(+l.b||0)+(+l.a||0);
+    const eff=(l.tirs>0)?((l.arr/l.tirs)*1000).toFixed(0):'—';
+    html+='<div class="man-ligne">'
+      +'<select onchange="majLigneManuelle('+i+',\'eqId\',this.value)">'
+        +'<option value="'+(manDom?manDom.id:'')+'"'+(l.eqId===(manDom&&manDom.id)?' selected':'')+'>'+esc(manDom?manDom.nom:'')+'</option>'
+        +'<option value="'+(manExt?manExt.id:'')+'"'+(l.eqId===(manExt&&manExt.id)?' selected':'')+'>'+esc(manExt?manExt.nom:'')+'</option>'
+      +'</select>'
+      +'<input placeholder="'+T('man.nomJoueur')+'" value="'+esc(l.nom)+'" oninput="majLigneManuelle('+i+',\'nom\',this.value)">'
+      +'<select onchange="majLigneManuelle('+i+',\'gardien\',this.value)">'
+        +'<option value="0"'+(!l.gardien?' selected':'')+'>'+T('man.patineur')+'</option>'
+        +'<option value="1"'+(l.gardien?' selected':'')+'>'+T('man.gardien')+'</option>'
+      +'</select>';
+    if(l.gardien){
+      html+='<div class="man-stats-mini">'
+        +'<label>'+T('man.tirs')+'<input type="number" min="0" value="'+(l.tirs||'')+'" oninput="majLigneManuelle('+i+',\'tirs\',this.value)"></label>'
+        +'<label>'+T('man.arrets')+'<input type="number" min="0" value="'+(l.arr||'')+'" oninput="majLigneManuelle('+i+',\'arr\',this.value)"></label>'
+        +'<span class="man-calc" id="man-calc-'+i+'">'+T('man.eff')+': <b>'+eff+'</b></span>'
+        +'</div>';
+    } else {
+      html+='<div class="man-stats-mini">'
+        +'<label>'+T('man.buts')+'<input type="number" min="0" value="'+(l.b||'')+'" oninput="majLigneManuelle('+i+',\'b\',this.value)"></label>'
+        +'<label>'+T('man.passes')+'<input type="number" min="0" value="'+(l.a||'')+'" oninput="majLigneManuelle('+i+',\'a\',this.value)"></label>'
+        +'<span class="man-calc" id="man-calc-'+i+'">'+T('man.points')+': <b>'+pts+'</b></span>'
+        +'</div>';
+    }
+    html+='<button class="del-btn" onclick="retirerLigneManuelle('+i+')">✕</button>';
+    html+='</div>';
+  });
+  cont.innerHTML=html;
+}
+async function enregistrerMatchManuel(){
+  const t=tournoiParId(tournoiActif); if(!t||!manDom||!manExt) return;
+  const sd=parseInt(document.getElementById('man-sd').value), se=parseInt(document.getElementById('man-se').value);
+  if(isNaN(sd)||isNaN(se)){ document.getElementById('man-statut').innerHTML='<span style="color:var(--rouge)">'+T('man.besoinScore')+'</span>'; return; }
+  const st=document.getElementById('man-statut'); st.innerHTML='<span style="color:var(--cyan)">'+T('man.enrEnCours')+'</span>';
+  try {
+    // 1) Créer/retrouver les joueurs (par nom + équipe)
+    const existants=joueursDuTournoi(t.id);
+    const mapPid={};
+    const aCreer=[];
+    manLignes.forEach(l=>{ const nom=(l.nom||'').trim(); if(!nom) return;
+      const cle=l.eqId+'|'+nom.toLowerCase();
+      if(mapPid[cle]) return;
+      const ex=existants.find(j=>j.equipeId===l.eqId && ((j.nom||'').trim().toLowerCase()===nom.toLowerCase() || (j.eaNom||'').trim().toLowerCase()===nom.toLowerCase()));
+      if(ex) mapPid[cle]=ex.id; else aCreer.push({cle, eqId:l.eqId, nom});
+    });
+    await Promise.all(aCreer.map(async info=>{
+      const ref=await db.collection('tJoueurs').add({tournoiId:t.id, equipeId:info.eqId, nom:info.nom, eaNom:info.nom, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+      mapPid[info.cle]=ref.id;
+    }));
+    // 2) Construire les lignes de stats
+    const lignes=[];
+    manLignes.forEach(l=>{ const nom=(l.nom||'').trim(); if(!nom) return;
+      const pid=mapPid[l.eqId+'|'+nom.toLowerCase()]; if(!pid) return;
+      if(l.gardien){ lignes.push({pid, eqId:l.eqId, b:0, a:0, arr:+l.arr||0, tirs:+l.tirs||0}); }
+      else { lignes.push({pid, eqId:l.eqId, b:+l.b||0, a:+l.a||0}); }
+    });
+    // 3) Créer ou mettre à jour le match (phase poule)
+    const existant=matchPouleEntre(t.id, manDom.id, manExt.id);
+    const payload={tournoiId:t.id, phase:'poule', poule:(eqParId(equipesDuTournoi(t.id),manDom.id)||{}).poule||'A',
+      domId:manDom.id, domNom:manDom.nom, extId:manExt.id, extNom:manExt.nom,
+      scoreDom:sd, scoreExt:se, joue:true, lignes:lignes};
+    if(existant){
+      await db.collection('tMatchs').doc(existant.id).update(payload);
+    } else {
+      payload.createdAt=firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection('tMatchs').add(payload);
+    }
+    fermerModale('modale-manuel');
+  } catch(e){ document.getElementById('man-statut').innerHTML='<span style="color:var(--rouge)">Erreur: '+e.message+'</span>'; }
 }
 
 /* ===================== ÉQUIPES ===================== */
@@ -896,6 +1059,7 @@ function statsJoueurTournoi(pid, tid){
     }
   });
   return { pj, b, a, pts:b+a, arr, tirs, arrPct: tirs>0?((arr/tirs)*100).toFixed(1)+'%':null,
+    arrEA: tirs>0?((arr/tirs)*1000).toFixed(0):null,
     gPj, gV, ba, arrPctNum: tirs>0?(arr/tirs*100):null, moy: gPj>0?(ba/gPj):null };
 }
 
@@ -1186,7 +1350,7 @@ function rendreStats(){
   html+='</div>';
   html+='<div class="stat-section-titre" style="margin-top:26px">🧤 '+T('ts.gardiens')+'</div>';
   html+='<div class="grille stat-grille">';
-  html+=carte(T('ts.efficacite'),'🛡️',parEff,j=>j.arrPctNum.toFixed(1)+'%');
+  html+=carte(T('ts.efficacite'),'🛡️',parEff,j=>j.arrEA);
   html+=carte(T('ts.moyenne'),'📉',parMoy,j=>j.moy.toFixed(2));
   html+=carte(T('ts.victoires'),'🏆',parVic,j=>j.gV);
   html+='</div>';
