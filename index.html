@@ -365,6 +365,7 @@ footer a{color:var(--cyan);text-decoration:none}
         <select id="eq-poule"></select>
         <input id="eq-logo" placeholder="Lien logo (optionnel)" data-i18n-ph="po.ph.logo">
       </div>
+      <input id="eq-eaclub" placeholder="ID club EA (pour import auto — optionnel)" data-i18n-ph="po.ph.eaclub">
       <button class="btn btn-cyan" onclick="ajouterEquipe()" data-i18n="po.ajEq">Ajouter l'équipe</button>
       <div style="border-top:1px dashed var(--bordure-cyan);margin:16px 0"></div>
       <div class="lbl" data-i18n="po.admMatch">Admin · Résultat de match de poule</div>
@@ -377,8 +378,22 @@ footer a{color:var(--cyan);text-decoration:none}
         <input id="mp-se" type="number" min="0" placeholder="Buts équipe 2" data-i18n-ph="po.ph.b2">
       </div>
       <button class="btn btn-cyan" onclick="ajouterMatchPoule()" data-i18n="po.enrMatch">Enregistrer le match</button>
+      <div style="border-top:1px dashed var(--bordure-cyan);margin:16px 0"></div>
+      <div class="lbl" data-i18n="jo.adm">Admin · Ajouter un joueur à une équipe</div>
+      <p style="color:var(--argent);font-size:12.5px;margin-bottom:10px" data-i18n="jo.admNote">Le gamertag EA sert à relier les stats importées au bon joueur.</p>
+      <select id="jo-equipe"></select>
+      <div class="deux-cols">
+        <input id="jo-nom" placeholder="Nom du joueur" data-i18n-ph="jo.ph.nom">
+        <input id="jo-eanom" placeholder="Gamertag EA (si différent)" data-i18n-ph="jo.ph.gamertag">
+      </div>
+      <button class="btn btn-cyan" onclick="ajouterJoueur()" data-i18n="jo.ajouter">Ajouter le joueur</button>
+      <div style="border-top:1px dashed var(--bordure-cyan);margin:16px 0"></div>
+      <div class="lbl" data-i18n="ea.adm">Admin · Import EA (matchs privés de club)</div>
+      <p style="color:var(--argent);font-size:12.5px;margin-bottom:10px" data-i18n="ea.admNote">Va chercher les derniers matchs privés d'une équipe qui a un ID club EA. Relie les joueurs par gamertag.</p>
+      <button class="btn btn-ghost" onclick="ouvrirImportEA()" data-i18n="ea.btn">📥 Importer depuis EA</button>
     </div>
     <div id="poules-contenu"></div>
+    <div id="meneurs-contenu"></div>
   </section>
 
   <!-- BRACKET -->
@@ -438,6 +453,25 @@ footer a{color:var(--cyan);text-decoration:none}
   </div>
 </div>
 
+<!-- MODALE IMPORT EA -->
+<div class="modal" id="modale-import">
+  <div class="modal-box" style="max-width:520px;text-align:left">
+    <h3>📥 <span data-i18n="ea.titre">Importer depuis EA</span></h3>
+    <p style="color:var(--argent);font-size:13px;margin-bottom:12px" data-i18n="ea.choisir">Choisis une équipe (qui a un ID club EA) pour aller chercher ses derniers matchs privés de club.</p>
+    <label class="champ-lbl" data-i18n="ea.equipe">Équipe à importer</label>
+    <select id="imp-equipe"></select>
+    <div class="cta-row" style="margin-top:6px">
+      <button class="btn btn-cyan" id="imp-btn-chercher" onclick="chercherMatchsEA()" data-i18n="ea.chercher">Chercher les matchs</button>
+      <button class="btn btn-ghost" onclick="fermerModale('modale-import')" data-i18n="commun.annuler">Annuler</button>
+    </div>
+    <div id="imp-statut" style="margin-top:12px;font-size:13px"></div>
+    <div id="imp-liste" style="margin-top:12px"></div>
+    <div id="imp-confirm-row" class="cta-row" style="margin-top:12px;display:none">
+      <button class="btn btn-cyan" onclick="confirmerImportEA()" data-i18n="ea.confirmer">Importer les matchs cochés</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
@@ -453,6 +487,10 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const ADMIN_PASS = "tournoi2026";
+/* --- Import EA (mêmes réglages que DYNASTY : Worker Cloudflare + Scrapfly) --- */
+const EA_WORKER = "https://dynasty-ea.dompierrekevin70.workers.dev";
+const EA_PLATFORM = "common-gen5";
+const EA_MATCHTYPE = "club_private";
 
 /* ===================== I18N ===================== */
 let langue = localStorage.getItem('t_langue') || 'fr';
@@ -477,6 +515,11 @@ const DICT = {
   'po.eyebrow':'Tour préliminaire','po.titre':'Poules','po.sous':'Le classement de chaque poule, calculé automatiquement.',
   'po.admEq':'Admin · Ajouter une équipe au tournoi','po.ajEq':'Ajouter l\'équipe','po.admMatch':'Admin · Résultat de match de poule','po.enrMatch':'Enregistrer le match',
   'po.ph.eq':'Nom de l\'équipe','po.ph.logo':'Lien logo (optionnel)','po.ph.b1':'Buts équipe 1','po.ph.b2':'Buts équipe 2',
+  'po.ph.eaclub':'ID club EA (pour import auto — optionnel)',
+  'jo.adm':'Admin · Ajouter un joueur à une équipe','jo.admNote':'Le gamertag EA sert à relier les stats importées au bon joueur.','jo.ph.nom':'Nom du joueur','jo.ph.gamertag':'Gamertag EA (si différent)','jo.ajouter':'Ajouter le joueur',
+  'ea.adm':'Admin · Import EA (matchs privés de club)','ea.admNote':'Va chercher les derniers matchs privés d\'une équipe qui a un ID club EA. Relie les joueurs par gamertag.','ea.btn':'📥 Importer depuis EA','ea.titre':'Importer depuis EA','ea.choisir':'Choisis une équipe (qui a un ID club EA) pour aller chercher ses derniers matchs privés de club.','ea.equipe':'Équipe à importer','ea.chercher':'Chercher les matchs','ea.confirmer':'Importer les matchs cochés',
+  'ea.aucunClub':'Aucune équipe n\'a d\'ID club EA. Ajoute-le dans la fiche de l\'équipe.','ea.chargement':'Connexion à EA… (10-20 sec)','ea.erreur':'Erreur de connexion à EA. Réessaie dans quelques minutes.','ea.matchsTrouves':'match(s) trouvé(s)','ea.pretsImport':'prêt(s) à importer','ea.horsLigue':'adversaire hors-tournoi','ea.nul':'égalité (ignoré)','ea.deja':'déjà importé','ea.nonRelies':'joueur(s) non reliés','ea.rienCoche':'Coche au moins un match.','ea.fini':'{n} match(s) importé(s)! Les stats sont à jour.',
+  'me.titre':'Meilleurs pointeurs','me.joueur':'Joueur','me.equipe':'Équipe','me.b':'B','me.a':'A',
   'po.poule':'Poule','po.tourNul':'Aucun tournoi','po.tourNul.s':'Crée un tournoi pour commencer.','po.eqVide':'Aucune équipe','po.eqVide.s':'Les équipes confirmées apparaîtront ici, réparties en poules.','po.3e':'Match pour la 3e place',
   'col.eq':'Équipe','col.pj':'PJ','col.v':'V','col.d':'D','col.bp':'BP','col.bc':'BC','col.diff':'+/-','col.pts':'PTS',
   'br.eyebrow':'La route vers la Coupe','br.titre':'Éliminatoires','br.sous':'Le tableau des séries. Le dernier debout soulève la Coupe.',
@@ -507,6 +550,11 @@ const DICT = {
   'po.eyebrow':'Preliminary round','po.titre':'Groups','po.sous':'Each group\'s standings, calculated automatically.',
   'po.admEq':'Admin · Add a team to the tournament','po.ajEq':'Add team','po.admMatch':'Admin · Group match result','po.enrMatch':'Save match',
   'po.ph.eq':'Team name','po.ph.logo':'Logo link (optional)','po.ph.b1':'Team 1 goals','po.ph.b2':'Team 2 goals',
+  'po.ph.eaclub':'EA club ID (for auto-import — optional)',
+  'jo.adm':'Admin · Add a player to a team','jo.admNote':'The EA gamertag links imported stats to the right player.','jo.ph.nom':'Player name','jo.ph.gamertag':'EA gamertag (if different)','jo.ajouter':'Add player',
+  'ea.adm':'Admin · EA Import (private club matches)','ea.admNote':'Fetches the latest private matches of a team that has an EA club ID. Links players by gamertag.','ea.btn':'📥 Import from EA','ea.titre':'Import from EA','ea.choisir':'Pick a team (with an EA club ID) to fetch its latest private club matches.','ea.equipe':'Team to import','ea.chercher':'Find matches','ea.confirmer':'Import checked matches',
+  'ea.aucunClub':'No team has an EA club ID. Add it in the team\'s details.','ea.chargement':'Connecting to EA… (10-20 sec)','ea.erreur':'EA connection error. Try again in a few minutes.','ea.matchsTrouves':'match(es) found','ea.pretsImport':'ready to import','ea.horsLigue':'opponent not in tournament','ea.nul':'tie (skipped)','ea.deja':'already imported','ea.nonRelies':'unlinked player(s)','ea.rienCoche':'Check at least one match.','ea.fini':'{n} match(es) imported! Stats are up to date.',
+  'me.titre':'Top scorers','me.joueur':'Player','me.equipe':'Team','me.b':'G','me.a':'A',
   'po.poule':'Group','po.tourNul':'No tournament','po.tourNul.s':'Create a tournament to get started.','po.eqVide':'No teams','po.eqVide.s':'Confirmed teams will appear here, split into groups.','po.3e':'Third-place match',
   'col.eq':'Team','col.pj':'GP','col.v':'W','col.d':'L','col.bp':'GF','col.bc':'GA','col.diff':'+/-','col.pts':'PTS',
   'br.eyebrow':'The road to the Cup','br.titre':'Playoffs','br.sous':'The playoff bracket. The last one standing lifts the Cup.',
@@ -533,7 +581,7 @@ function basculerLangue(){ langue = (langue==='fr'?'en':'fr'); localStorage.setI
 /* ===================== ÉTAT ===================== */
 let estAdmin = false;
 let tournoiActif = null;              // id du tournoi sélectionné
-let snapTournois=null, snapEquipes=null, snapMatchs=null, snapInsc=null;
+let snapTournois=null, snapEquipes=null, snapMatchs=null, snapInsc=null, snapJoueurs=null;
 
 /* ===================== ADMIN ===================== */
 function ouvrirLogin(){ document.getElementById('modale-login').classList.add('open'); document.getElementById('login-err').style.display='none'; }
@@ -575,6 +623,7 @@ function init(){
   db.collection('tournois').orderBy('createdAt','desc').onSnapshot(s=>{snapTournois=s; rafraichir();}, e=>console.warn(e));
   db.collection('tEquipes').onSnapshot(s=>{snapEquipes=s; rafraichir();}, e=>console.warn(e));
   db.collection('tMatchs').onSnapshot(s=>{snapMatchs=s; rafraichir();}, e=>console.warn(e));
+  db.collection('tJoueurs').onSnapshot(s=>{snapJoueurs=s; rafraichir();}, e=>console.warn(e));
   db.collection('tInscriptions').orderBy('createdAt','desc').onSnapshot(s=>{snapInsc=s; rafraichir();}, e=>console.warn(e));
 }
 
@@ -595,10 +644,10 @@ function ajouterTournoi(){
   const date=document.getElementById('to-date').value.trim();
   const nbPoules=parseInt(document.getElementById('to-poules').value)||1;
   const description=document.getElementById('to-desc').value.trim();
-  if(!nom){ alerT('Donne un nom au tournoi.'); return; }
+  if(!nom){ alert('Donne un nom au tournoi.'); return; }
   db.collection('tournois').add({nom,date,nbPoules,description,statut:'inscriptions',champion:null,createdAt:firebase.firestore.FieldValue.serverTimestamp()})
     .then(()=>{ ['to-nom','to-date','to-poules','to-desc'].forEach(i=>document.getElementById(i).value=''); })
-    .catch(e=>alerT('Erreur : '+e.message));
+    .catch(e=>alert('Erreur : '+e.message));
 }
 function changerStatut(id, statut){ db.collection('tournois').doc(id).update({statut}).catch(e=>alert(e.message)); }
 function definirChampion(id, eqId){ db.collection('tournois').doc(id).update({champion:eqId, statut:'termine'}).catch(e=>alert(e.message)); }
@@ -686,31 +735,58 @@ function rendreSelects(){
   // selects de match (poule + bracket) avec équipes du tournoi
   const eqs=t?equipesDuTournoi(t.id):[];
   const opt='<option value="">— équipe —</option>'+eqs.map(e=>'<option value="'+e.id+'">'+esc(e.nom)+'</option>').join('');
-  ['mp-dom','mp-ext','mb-dom','mb-ext'].forEach(id=>{ const s=document.getElementById(id); if(s) s.innerHTML=opt; });
+  ['mp-dom','mp-ext','mb-dom','mb-ext','jo-equipe'].forEach(id=>{ const s=document.getElementById(id); if(s) s.innerHTML=opt; });
 }
 function changerTournoiActif(id){ tournoiActif=id; rafraichir(); }
 
 /* ===================== ÉQUIPES ===================== */
 function ajouterEquipe(){
-  const t=tournoiParId(tournoiActif); if(!t){ alerT('Choisis un tournoi.'); return; }
+  const t=tournoiParId(tournoiActif); if(!t){ alert('Choisis un tournoi.'); return; }
   const nom=document.getElementById('eq-nom').value.trim();
   const couleur=document.getElementById('eq-couleur').value;
   const poule=document.getElementById('eq-poule').value||'A';
   const logo=document.getElementById('eq-logo').value.trim();
-  if(!nom){ alerT('Nom de l\'équipe requis.'); return; }
-  db.collection('tEquipes').add({tournoiId:t.id,nom,couleur,poule,logo,createdAt:firebase.firestore.FieldValue.serverTimestamp()})
-    .then(()=>{ document.getElementById('eq-nom').value=''; document.getElementById('eq-logo').value=''; })
+  const eaClubId=document.getElementById('eq-eaclub').value.trim();
+  if(!nom){ alert('Nom de l\'équipe requis.'); return; }
+  db.collection('tEquipes').add({tournoiId:t.id,nom,couleur,poule,logo,eaClubId,createdAt:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(()=>{ document.getElementById('eq-nom').value=''; document.getElementById('eq-logo').value=''; document.getElementById('eq-eaclub').value=''; })
     .catch(e=>alert(e.message));
 }
 function supprimerEquipe(id){ if(confirm('Retirer cette équipe ?')) db.collection('tEquipes').doc(id).delete().catch(e=>alert(e.message)); }
+
+/* ===================== JOUEURS (pour relier les stats EA) ===================== */
+function ajouterJoueur(){
+  const t=tournoiParId(tournoiActif); if(!t){ alert('Choisis un tournoi.'); return; }
+  const equipeId=document.getElementById('jo-equipe').value;
+  const nom=document.getElementById('jo-nom').value.trim();
+  const eaNom=document.getElementById('jo-eanom').value.trim();
+  if(!equipeId){ alert('Choisis une équipe.'); return; }
+  if(!nom){ alert('Nom du joueur requis.'); return; }
+  db.collection('tJoueurs').add({tournoiId:t.id, equipeId, nom, eaNom, createdAt:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(()=>{ document.getElementById('jo-nom').value=''; document.getElementById('jo-eanom').value=''; })
+    .catch(e=>alert(e.message));
+}
+function supprimerJoueur(id){ if(confirm('Retirer ce joueur ?')) db.collection('tJoueurs').doc(id).delete().catch(e=>alert(e.message)); }
+function joueursDuTournoi(tid){ const a=[]; if(snapJoueurs) snapJoueurs.forEach(d=>{const j=d.data(); if(j.tournoiId===tid) a.push({id:d.id,...j});}); return a; }
+
+/* Stats d'un joueur (buts, passes, points, matchs) calculées des tMatchs */
+function statsJoueurTournoi(pid, tid){
+  let pj=0,b=0,a=0,arr=0,tirs=0;
+  if(snapMatchs) snapMatchs.forEach(d=>{ const m=d.data(); if(m.tournoiId!==tid) return;
+    const l=(m.lignes||[]).find(x=>x.pid===pid); if(!l) return;
+    pj++; b+=+l.b||0; a+=+l.a||0;
+    if(l.tirs!==undefined){ arr+=+l.arr||0; tirs+=+l.tirs||0; }
+  });
+  return { pj, b, a, pts:b+a, arr, tirs, arrPct: tirs>0?((arr/tirs)*100).toFixed(1)+'%':null };
+}
 
 /* ===================== MATCHS DE POULE ===================== */
 function ajouterMatchPoule(){
   const t=tournoiParId(tournoiActif); if(!t) return;
   const domId=document.getElementById('mp-dom').value, extId=document.getElementById('mp-ext').value;
   const sd=parseInt(document.getElementById('mp-sd').value), se=parseInt(document.getElementById('mp-se').value);
-  if(!domId||!extId||domId===extId){ alerT('Choisis deux équipes différentes.'); return; }
-  if(isNaN(sd)||isNaN(se)){ alerT('Entre les deux scores.'); return; }
+  if(!domId||!extId||domId===extId){ alert('Choisis deux équipes différentes.'); return; }
+  if(isNaN(sd)||isNaN(se)){ alert('Entre les deux scores.'); return; }
   const eqs=equipesDuTournoi(t.id); const dom=eqParId(eqs,domId), ext=eqParId(eqs,extId);
   db.collection('tMatchs').add({tournoiId:t.id,phase:'poule',poule:dom.poule||'A',
     domId,domNom:dom.nom,extId,extNom:ext.nom,scoreDom:sd,scoreExt:se,joue:true,
@@ -719,6 +795,147 @@ function ajouterMatchPoule(){
     .catch(e=>alert(e.message));
 }
 function supprimerMatch(id){ if(confirm('Supprimer ce match ?')) db.collection('tMatchs').doc(id).delete().catch(e=>alert(e.message)); }
+
+/* ===================== IMPORT EA (matchs privés de club) ===================== */
+let impAnalyse = [];  // matchs analysés, prêts à importer
+
+function ouvrirImportEA(){
+  const t=tournoiParId(tournoiActif);
+  if(!t){ alert('Choisis un tournoi.'); return; }
+  const eqs=equipesDuTournoi(t.id).filter(e=>e.eaClubId && String(e.eaClubId).trim());
+  const sel=document.getElementById('imp-equipe');
+  if(eqs.length===0){
+    sel.innerHTML='<option value="">—</option>';
+    document.getElementById('imp-statut').innerHTML='<span style="color:var(--rouge)">'+T('ea.aucunClub')+'</span>';
+  } else {
+    sel.innerHTML=eqs.map(e=>'<option value="'+e.id+'">'+esc(e.nom)+' (club '+esc(e.eaClubId)+')</option>').join('');
+    document.getElementById('imp-statut').innerHTML='';
+  }
+  document.getElementById('imp-liste').innerHTML='';
+  document.getElementById('imp-confirm-row').style.display='none';
+  impAnalyse=[];
+  document.getElementById('modale-import').classList.add('open');
+}
+
+function chercherMatchsEA(){
+  const t=tournoiParId(tournoiActif); if(!t) return;
+  const eqId=document.getElementById('imp-equipe').value;
+  const eqs=equipesDuTournoi(t.id);
+  const eq=eqParId(eqs,eqId);
+  if(!eq || !eq.eaClubId){ document.getElementById('imp-statut').innerHTML='<span style="color:var(--rouge)">'+T('ea.aucunClub')+'</span>'; return; }
+  const st=document.getElementById('imp-statut');
+  st.innerHTML='<span style="color:var(--cyan)">'+T('ea.chargement')+'</span>';
+  document.getElementById('imp-liste').innerHTML='';
+  document.getElementById('imp-confirm-row').style.display='none';
+
+  const url=EA_WORKER+'/?path=clubs/matches&clubIds='+encodeURIComponent(eq.eaClubId)+'&platform='+EA_PLATFORM+'&matchType='+EA_MATCHTYPE;
+  fetch(url).then(r=>r.json()).then(matchs=>{
+    if(!Array.isArray(matchs)){ st.innerHTML='<span style="color:var(--rouge)">'+T('ea.erreur')+'</span>'; return; }
+    impAnalyse = analyserMatchsEA(matchs, t.id, eqs);
+    afficherAnalyseEA(st);
+  }).catch(()=>{ st.innerHTML='<span style="color:var(--rouge)">'+T('ea.erreur')+'</span>'; });
+}
+
+/* Relie un club EA -> équipe DYNASTY du tournoi */
+function equipeParEaClub(eqs, clubId){
+  return eqs.find(e=>e.eaClubId && String(e.eaClubId).trim()===String(clubId).trim())||null;
+}
+/* Relie un gamertag -> joueur du tournoi (collection tJoueurs, sinon capitaine) */
+function joueurTournoiParGamertag(eqId, gamertag){
+  if(!gamertag) return null;
+  const g=gamertag.trim().toLowerCase();
+  if(snapJoueurs){
+    let trouve=null;
+    snapJoueurs.forEach(d=>{ const j=d.data(); if(j.equipeId===eqId){
+      const n1=(j.eaNom||'').trim().toLowerCase(), n2=(j.nom||'').trim().toLowerCase();
+      if(n1===g || n2===g) trouve={id:d.id,nom:j.nom};
+    }});
+    if(trouve) return trouve;
+  }
+  return null;
+}
+function eaMatchDejaImporte(tid, eaMatchId){
+  let oui=false;
+  if(snapMatchs) snapMatchs.forEach(d=>{ const m=d.data(); if(m.tournoiId===tid && String(m.eaMatchId||'')===String(eaMatchId)) oui=true; });
+  return oui;
+}
+
+function analyserMatchsEA(matchs, tid, eqs){
+  const res=[];
+  matchs.forEach(m=>{
+    const clubIds=Object.keys(m.clubs||{});
+    if(clubIds.length<2) return;
+    const [cA,cB]=clubIds;
+    const eqA=equipeParEaClub(eqs,cA), eqB=equipeParEaClub(eqs,cB);
+    const butsA=+((m.clubs[cA]||{}).goals)||0, butsB=+((m.clubs[cB]||{}).goals)||0;
+    let statut='pret', raison='';
+    if(!eqA||!eqB){ statut='horsLigue'; raison=T('ea.horsLigue'); }
+    else if(butsA===butsB){ statut='nul'; raison=T('ea.nul'); }
+    else if(eaMatchDejaImporte(tid,m.matchId)){ statut='deja'; raison=T('ea.deja'); }
+
+    let lignes=[], manquants=0;
+    if(statut==='pret'){
+      [[cA,eqA],[cB,eqB]].forEach(pair=>{
+        const cid=pair[0], eq=pair[1];
+        const joueurs=(m.players&&m.players[cid])||{};
+        Object.keys(joueurs).forEach(pk=>{
+          const p=joueurs[pk];
+          const j=joueurTournoiParGamertag(eq.id, p.playername);
+          if(j){
+            const ligne={pid:j.id, eqId:eq.id, b:+p.skgoals||0, a:+p.skassists||0};
+            if(p.position==='goalie'||(+p.glshots||0)>0){ ligne.arr=+p.glsaves||0; ligne.tirs=+p.glshots||0; }
+            lignes.push(ligne);
+          } else { manquants++; }
+        });
+      });
+    }
+    res.push({ eaMatchId:String(m.matchId), timestamp:+m.timestamp||null, statut, raison, manquants,
+      domId:eqA?eqA.id:null, domNom:eqA?eqA.nom:((m.clubs[cA]||{}).details||{}).name||cA,
+      extId:eqB?eqB.id:null, extNom:eqB?eqB.nom:((m.clubs[cB]||{}).details||{}).name||cB,
+      butsDom:butsA, butsExt:butsB, lignes });
+  });
+  return res;
+}
+
+function afficherAnalyseEA(st){
+  const prets=impAnalyse.filter(x=>x.statut==='pret');
+  st.innerHTML='<span style="color:var(--glace)">'+impAnalyse.length+' '+T('ea.matchsTrouves')+' · <b style="color:var(--cyan)">'+prets.length+'</b> '+T('ea.pretsImport')+'</span>';
+  let html='<div style="display:flex;flex-direction:column;gap:7px;max-height:300px;overflow:auto">';
+  impAnalyse.forEach((x,i)=>{
+    const ok=x.statut==='pret';
+    html+='<label style="display:flex;align-items:center;gap:10px;background:var(--acier2);border:1px solid '+(ok?'var(--bordure-cyan)':'var(--bordure)')+';border-radius:9px;padding:9px 12px;'+(ok?'':'opacity:.55')+'">'
+      + (ok?'<input type="checkbox" checked data-idx="'+i+'" style="width:auto;margin:0;accent-color:var(--cyan)">':'<span style="width:16px"></span>')
+      + '<span style="flex:1;font-size:13px">'+esc(x.domNom)+' <b>'+x.butsDom+'</b> – <b>'+x.butsExt+'</b> '+esc(x.extNom)+'</span>'
+      + (ok ? (x.manquants?'<span style="font-size:11px;color:var(--or)">'+x.manquants+' '+T('ea.nonRelies')+'</span>':'<span style="font-size:11px;color:var(--vert)">✓</span>')
+            : '<span style="font-size:11px;color:var(--argent2)">'+x.raison+'</span>')
+      + '</label>';
+  });
+  html+='</div>';
+  document.getElementById('imp-liste').innerHTML=html;
+  document.getElementById('imp-confirm-row').style.display = prets.length?'flex':'none';
+}
+
+function confirmerImportEA(){
+  const t=tournoiParId(tournoiActif); if(!t) return;
+  const boites=document.querySelectorAll('#imp-liste input[type=checkbox]:checked');
+  if(boites.length===0){ alert(T('ea.rienCoche')); return; }
+  const eqs=equipesDuTournoi(t.id);
+  let done=0, total=boites.length;
+  boites.forEach(cb=>{
+    const x=impAnalyse[+cb.getAttribute('data-idx')];
+    if(!x||x.statut!=='pret') { total--; return; }
+    const dom=eqParId(eqs,x.domId);
+    db.collection('tMatchs').add({
+      tournoiId:t.id, phase:'poule', poule:(dom&&dom.poule)||'A',
+      domId:x.domId, domNom:x.domNom, extId:x.extId, extNom:x.extNom,
+      scoreDom:x.butsDom, scoreExt:x.butsExt, joue:true,
+      lignes:x.lignes, eaMatchId:x.eaMatchId, eaTs:x.timestamp,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    }).then(()=>{ done++; if(done>=total){ fermerModale('modale-import'); alert(T('ea.fini').replace('{n}',done)); } })
+      .catch(e=>alert(e.message));
+  });
+  if(total===0){ alert(T('ea.rienCoche')); }
+}
 
 /* Classement d'une poule */
 function classementPoule(tid, poule, eqs){
@@ -774,6 +991,28 @@ function rendrePoules(){
     }
   });
   c.innerHTML=html||videHTML('🛡️',T('po.eqVide'),T('po.eqVide.s'));
+  rendreMeneursTournoi(t.id);
+}
+
+/* Meneurs de pointage du tournoi (à partir des stats importées) */
+function rendreMeneursTournoi(tid){
+  const cont=document.getElementById('meneurs-contenu'); if(!cont) return;
+  const joueurs=joueursDuTournoi(tid).map(j=>{
+    const eq=eqParId(equipesDuTournoi(tid), j.equipeId)||{};
+    return Object.assign({id:j.id, nom:j.nom, eqNom:eq.nom||'', couleur:eq.couleur}, statsJoueurTournoi(j.id, tid));
+  }).filter(j=>j.pj>0);
+  if(joueurs.length===0){ cont.innerHTML=''; return; }
+  joueurs.sort((a,b)=> b.pts-a.pts || b.b-a.b || (a.nom||'').localeCompare(b.nom||''));
+  let html='<div class="pool-titre" style="margin-top:30px">'+T('me.titre')+'</div>';
+  html+='<div class="tbl-wrap"><table><thead><tr><th class="rang">#</th><th class="eq">'+T('me.joueur')+'</th><th>'+T('me.equipe')+'</th><th>'+T('col.pj')+'</th><th>'+T('me.b')+'</th><th>'+T('me.a')+'</th><th>'+T('col.pts')+'</th></tr></thead><tbody>';
+  joueurs.slice(0,15).forEach((j,i)=>{
+    html+='<tr class="'+(i<3?'q':'')+'"><td class="rang">'+(i+1)+'</td>'
+      +'<td class="eq">'+esc(j.nom)+'</td>'
+      +'<td style="font-size:12px;color:var(--argent)"><span class="pastille" style="background:'+(j.couleur||'#38C6E6')+'"></span>'+esc(j.eqNom)+'</td>'
+      +'<td>'+j.pj+'</td><td>'+j.b+'</td><td>'+j.a+'</td><td class="pts">'+j.pts+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+  cont.innerHTML=html;
 }
 
 /* ===================== BRACKET ===================== */
@@ -781,7 +1020,7 @@ function ajouterMatchBracket(){
   const t=tournoiParId(tournoiActif); if(!t) return;
   const phase=document.getElementById('mb-phase').value;
   const domId=document.getElementById('mb-dom').value, extId=document.getElementById('mb-ext').value;
-  if(!domId||!extId||domId===extId){ alerT('Choisis deux équipes différentes.'); return; }
+  if(!domId||!extId||domId===extId){ alert('Choisis deux équipes différentes.'); return; }
   const sdv=document.getElementById('mb-sd').value, sev=document.getElementById('mb-se').value;
   const sd=sdv===''?null:parseInt(sdv), se=sev===''?null:parseInt(sev);
   const joue = sd!==null && se!==null;
@@ -846,8 +1085,8 @@ function envoyerInscription(){
   const capitaine=document.getElementById('in-cap').value.trim();
   const plateforme=document.getElementById('in-plat').value;
   const discord=document.getElementById('in-discord').value.trim();
-  if(!tournoiId){ alerT('Aucun tournoi ouvert aux inscriptions.'); return; }
-  if(!nomEquipe||!capitaine){ alerT('Nom d\'équipe et capitaine requis.'); return; }
+  if(!tournoiId){ alert('Aucun tournoi ouvert aux inscriptions.'); return; }
+  if(!nomEquipe||!capitaine){ alert('Nom d\'équipe et capitaine requis.'); return; }
   db.collection('tInscriptions').add({tournoiId,nomEquipe,capitaine,plateforme,discord,statut:'nouveau',createdAt:firebase.firestore.FieldValue.serverTimestamp()})
     .then(()=>{
       ['in-equipe','in-cap','in-discord'].forEach(i=>document.getElementById(i).value='');
@@ -879,7 +1118,7 @@ function confirmerInscription(id){
   db.collection('tEquipes').add({tournoiId:insc.tournoiId,nom:insc.nomEquipe,couleur:'#38C6E6',poule,logo:'',
     capitaine:insc.capitaine,createdAt:firebase.firestore.FieldValue.serverTimestamp()})
     .then(()=>db.collection('tInscriptions').doc(id).update({statut:'confirme'}))
-    .then(()=>alerT('Équipe créée dans la poule '+poule+'. Tu peux la déplacer/éditer dans Poules.'))
+    .then(()=>alert('Équipe créée dans la poule '+poule+'. Tu peux la déplacer/éditer dans Poules.'))
     .catch(e=>alert(e.message));
 }
 function supprimerInscription(id){ if(confirm('Supprimer cette inscription ?')) db.collection('tInscriptions').doc(id).delete().catch(e=>alert(e.message)); }
