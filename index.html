@@ -1042,8 +1042,9 @@ function ouvrirResumeEquipe(eqId){
 
 async function enregistrerMatchManuel(){
   const t=tournoiParId(tournoiActif); if(!t||!manDom||!manExt) return;
-  const sd=parseInt(document.getElementById('man-sd').value), se=parseInt(document.getElementById('man-se').value);
-  if(isNaN(sd)||isNaN(se)){ document.getElementById('man-statut').innerHTML='<span style="color:var(--rouge)">'+T('man.besoinScore')+'</span>'; return; }
+  let sd=parseInt(document.getElementById('man-sd').value), se=parseInt(document.getElementById('man-se').value);
+  if(isNaN(sd)) sd=0;
+  if(isNaN(se)) se=0;
   const st=document.getElementById('man-statut'); st.innerHTML='<span style="color:var(--cyan)">'+T('man.enrEnCours')+'</span>';
   try {
     // 1) Créer/retrouver les joueurs (par nom + équipe)
