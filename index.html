@@ -535,7 +535,7 @@ const DICT = {
   'po.ph.eaclub':'ID club EA (pour import auto — optionnel)',
   'jo.adm':'Admin · Ajouter un joueur à une équipe','jo.admNote':'Le gamertag EA sert à relier les stats importées au bon joueur.','jo.ph.nom':'Nom du joueur','jo.ph.gamertag':'Gamertag EA (si différent)','jo.ajouter':'Ajouter le joueur',
   'ea.adm':'Admin · Import EA (matchs privés de club)','ea.admNote':'Va chercher les derniers matchs privés d\'une équipe qui a un ID club EA. Relie les joueurs par gamertag.','ea.btn':'📥 Importer depuis EA','ea.titre':'Importer depuis EA','ea.choisir':'Choisis une équipe (qui a un ID club EA) pour aller chercher ses derniers matchs privés de club.','ea.equipe':'Équipe à importer','ea.chercher':'Chercher les matchs','ea.confirmer':'Importer les matchs cochés',
-  'ea.aucunClub':'Aucune équipe n\'a d\'ID club EA. Ajoute-le dans la fiche de l\'équipe.','ea.chargement':'Connexion à EA… (10-20 sec)','ea.erreur':'Erreur de connexion à EA. Réessaie dans quelques minutes.','ea.matchsTrouves':'match(s) trouvé(s)','ea.pretsImport':'prêt(s) à importer','ea.horsLigue':'adversaire hors-tournoi','ea.nul':'égalité (ignoré)','ea.deja':'déjà importé','ea.nonRelies':'joueur(s) non reliés','ea.rienCoche':'Coche au moins un match.','ea.fini':'{n} match(s) importé(s)! Les stats sont à jour.',
+  'ea.aucunClub':'Aucune équipe n\'a d\'ID club EA. Ajoute-le dans la fiche de l\'équipe.','ea.chargement':'Connexion à EA… (10-20 sec)','ea.erreur':'Erreur de connexion à EA. Réessaie dans quelques minutes.','ea.matchsTrouves':'match(s) trouvé(s)','ea.pretsImport':'prêt(s) à importer','ea.horsLigue':'adversaire hors-tournoi','ea.nul':'égalité (ignoré)','ea.deja':'déjà importé','ea.nonRelies':'joueur(s) non reliés','ea.nouveaux':'nouveaux joueurs','ea.importEnCours':'Import en cours…','ea.rienCoche':'Coche au moins un match.','ea.fini':'{n} match(s) importé(s)! Les stats sont à jour.','ea.finiPlus':'{n} match(s) importé(s) · {j} joueur(s) créé(s)! Les stats sont à jour.',
   'me.titre':'Meilleurs pointeurs','me.joueur':'Joueur','me.equipe':'Équipe','me.b':'B','me.a':'A',
   'nav.calendrier':'Calendrier','cal.eyebrow':'Horaire','cal.titre':'Calendrier','cal.sous':'Qui joue contre qui. Les scores s\'affichent une fois les matchs joués.','cal.adm':'Admin · Ajouter un match à l\'horaire','cal.admNote':'Crée les affrontements prévus. Ils se remplissent avec le score quand tu entres/importes le résultat.','cal.ajouter':'Ajouter au calendrier','cal.vide.t':'Horaire à venir','cal.vide.s':'Les affrontements prévus apparaîtront ici.',
   'po.poule':'Poule','po.tourNul':'Aucun tournoi','po.tourNul.s':'Crée un tournoi pour commencer.','po.eqVide':'Aucune équipe','po.eqVide.s':'Les équipes confirmées apparaîtront ici, réparties en poules.','po.3e':'Match pour la 3e place',
@@ -571,7 +571,7 @@ const DICT = {
   'po.ph.eaclub':'EA club ID (for auto-import — optional)',
   'jo.adm':'Admin · Add a player to a team','jo.admNote':'The EA gamertag links imported stats to the right player.','jo.ph.nom':'Player name','jo.ph.gamertag':'EA gamertag (if different)','jo.ajouter':'Add player',
   'ea.adm':'Admin · EA Import (private club matches)','ea.admNote':'Fetches the latest private matches of a team that has an EA club ID. Links players by gamertag.','ea.btn':'📥 Import from EA','ea.titre':'Import from EA','ea.choisir':'Pick a team (with an EA club ID) to fetch its latest private club matches.','ea.equipe':'Team to import','ea.chercher':'Find matches','ea.confirmer':'Import checked matches',
-  'ea.aucunClub':'No team has an EA club ID. Add it in the team\'s details.','ea.chargement':'Connecting to EA… (10-20 sec)','ea.erreur':'EA connection error. Try again in a few minutes.','ea.matchsTrouves':'match(es) found','ea.pretsImport':'ready to import','ea.horsLigue':'opponent not in tournament','ea.nul':'tie (skipped)','ea.deja':'already imported','ea.nonRelies':'unlinked player(s)','ea.rienCoche':'Check at least one match.','ea.fini':'{n} match(es) imported! Stats are up to date.',
+  'ea.aucunClub':'No team has an EA club ID. Add it in the team\'s details.','ea.chargement':'Connecting to EA… (10-20 sec)','ea.erreur':'EA connection error. Try again in a few minutes.','ea.matchsTrouves':'match(es) found','ea.pretsImport':'ready to import','ea.horsLigue':'opponent not in tournament','ea.nul':'tie (skipped)','ea.deja':'already imported','ea.nonRelies':'unlinked player(s)','ea.nouveaux':'new players','ea.importEnCours':'Importing…','ea.rienCoche':'Check at least one match.','ea.fini':'{n} match(es) imported! Stats are up to date.','ea.finiPlus':'{n} match(es) imported · {j} player(s) created! Stats are up to date.',
   'me.titre':'Top scorers','me.joueur':'Player','me.equipe':'Team','me.b':'G','me.a':'A',
   'nav.calendrier':'Schedule','cal.eyebrow':'Schedule','cal.titre':'Schedule','cal.sous':'Who plays who. Scores show up once matches are played.','cal.adm':'Admin · Add a match to the schedule','cal.admNote':'Create the planned matchups. They fill in with the score when you enter/import the result.','cal.ajouter':'Add to schedule','cal.vide.t':'Schedule coming soon','cal.vide.s':'Planned matchups will appear here.',
   'po.poule':'Group','po.tourNul':'No tournament','po.tourNul.s':'Create a tournament to get started.','po.eqVide':'No teams','po.eqVide.s':'Confirmed teams will appear here, split into groups.','po.3e':'Third-place match',
@@ -936,23 +936,24 @@ function analyserMatchsEA(matchs, tid, eqs){
     else if(butsA===butsB){ statut='nul'; raison=T('ea.nul'); }
     else if(eaMatchDejaImporte(tid,m.matchId)){ statut='deja'; raison=T('ea.deja'); }
 
-    let lignes=[], manquants=0;
+    let lignes=[], nouveaux=0;
     if(statut==='pret'){
       [[cA,eqA],[cB,eqB]].forEach(pair=>{
         const cid=pair[0], eq=pair[1];
         const joueurs=(m.players&&m.players[cid])||{};
         Object.keys(joueurs).forEach(pk=>{
           const p=joueurs[pk];
-          const j=joueurTournoiParGamertag(eq.id, p.playername);
-          if(j){
-            const ligne={pid:j.id, eqId:eq.id, b:+p.skgoals||0, a:+p.skassists||0};
-            if(p.position==='goalie'||(+p.glshots||0)>0){ ligne.arr=+p.glsaves||0; ligne.tirs=+p.glshots||0; }
-            lignes.push(ligne);
-          } else { manquants++; }
+          const gamertag=(p.playername||'').trim();
+          if(!gamertag) return;
+          const ex=joueurTournoiParGamertag(eq.id, gamertag);
+          const ligne={ eqId:eq.id, gamertag:gamertag, pid: ex?ex.id:null, b:+p.skgoals||0, a:+p.skassists||0 };
+          if(p.position==='goalie'||(+p.glshots||0)>0){ ligne.arr=+p.glsaves||0; ligne.tirs=+p.glshots||0; }
+          if(!ex) nouveaux++;
+          lignes.push(ligne);
         });
       });
     }
-    res.push({ eaMatchId:String(m.matchId), timestamp:+m.timestamp||null, statut, raison, manquants,
+    res.push({ eaMatchId:String(m.matchId), timestamp:+m.timestamp||null, statut, raison, nouveaux,
       domId:eqA?eqA.id:null, domNom:eqA?eqA.nom:((m.clubs[cA]||{}).details||{}).name||cA,
       extId:eqB?eqB.id:null, extNom:eqB?eqB.nom:((m.clubs[cB]||{}).details||{}).name||cB,
       butsDom:butsA, butsExt:butsB, lignes });
@@ -969,7 +970,7 @@ function afficherAnalyseEA(st){
     html+='<label style="display:flex;align-items:center;gap:10px;background:var(--acier2);border:1px solid '+(ok?'var(--bordure-cyan)':'var(--bordure)')+';border-radius:9px;padding:9px 12px;'+(ok?'':'opacity:.55')+'">'
       + (ok?'<input type="checkbox" checked data-idx="'+i+'" style="width:auto;margin:0;accent-color:var(--cyan)">':'<span style="width:16px"></span>')
       + '<span style="flex:1;font-size:13px">'+esc(x.domNom)+' <b>'+x.butsDom+'</b> – <b>'+x.butsExt+'</b> '+esc(x.extNom)+'</span>'
-      + (ok ? (x.manquants?'<span style="font-size:11px;color:var(--or)">'+x.manquants+' '+T('ea.nonRelies')+'</span>':'<span style="font-size:11px;color:var(--vert)">✓</span>')
+      + (ok ? (x.nouveaux?'<span style="font-size:11px;color:var(--cyan)">+'+x.nouveaux+' '+T('ea.nouveaux')+'</span>':'<span style="font-size:11px;color:var(--vert)">✓</span>')
             : '<span style="font-size:11px;color:var(--argent2)">'+x.raison+'</span>')
       + '</label>';
   });
@@ -978,26 +979,52 @@ function afficherAnalyseEA(st){
   document.getElementById('imp-confirm-row').style.display = prets.length?'flex':'none';
 }
 
-function confirmerImportEA(){
+async function confirmerImportEA(){
   const t=tournoiParId(tournoiActif); if(!t) return;
   const boites=document.querySelectorAll('#imp-liste input[type=checkbox]:checked');
   if(boites.length===0){ alert(T('ea.rienCoche')); return; }
-  const eqs=equipesDuTournoi(t.id);
-  let done=0, total=boites.length;
-  boites.forEach(cb=>{
-    const x=impAnalyse[+cb.getAttribute('data-idx')];
-    if(!x||x.statut!=='pret') { total--; return; }
-    const dom=eqParId(eqs,x.domId);
-    db.collection('tMatchs').add({
-      tournoiId:t.id, phase:'poule', poule:(dom&&dom.poule)||'A',
-      domId:x.domId, domNom:x.domNom, extId:x.extId, extNom:x.extNom,
-      scoreDom:x.butsDom, scoreExt:x.butsExt, joue:true,
-      lignes:x.lignes, eaMatchId:x.eaMatchId, eaTs:x.timestamp,
-      createdAt:firebase.firestore.FieldValue.serverTimestamp()
-    }).then(()=>{ done++; if(done>=total){ fermerModale('modale-import'); alert(T('ea.fini').replace('{n}',done)); } })
-      .catch(e=>alert(e.message));
-  });
-  if(total===0){ alert(T('ea.rienCoche')); }
+  const aImporter=Array.from(boites).map(cb=>impAnalyse[+cb.getAttribute('data-idx')]).filter(x=>x&&x.statut==='pret');
+  if(aImporter.length===0){ alert(T('ea.rienCoche')); return; }
+
+  const btn=document.querySelector('#imp-confirm-row .btn');
+  if(btn){ btn.disabled=true; btn.textContent=T('ea.importEnCours'); }
+
+  try {
+    // 1) Rassembler les joueurs à créer (uniques par équipe + gamertag, sans pid existant)
+    const aCreer={};
+    aImporter.forEach(x=>{ (x.lignes||[]).forEach(l=>{
+      if(!l.pid){ const k=l.eqId+'|'+l.gamertag.toLowerCase(); if(!aCreer[k]) aCreer[k]={eqId:l.eqId, gamertag:l.gamertag}; }
+    }); });
+    // 2) Les créer, bâtir la map clé -> nouvel ID
+    const mapNouveaux={};
+    await Promise.all(Object.keys(aCreer).map(async k=>{
+      const info=aCreer[k];
+      const ref=await db.collection('tJoueurs').add({ tournoiId:t.id, equipeId:info.eqId,
+        nom:info.gamertag, eaNom:info.gamertag, createdAt:firebase.firestore.FieldValue.serverTimestamp() });
+      mapNouveaux[k]=ref.id;
+    }));
+    // 3) Créer les matchs avec les pid résolus (existants OU nouvellement créés)
+    const eqs=equipesDuTournoi(t.id);
+    await Promise.all(aImporter.map(x=>{
+      const dom=eqParId(eqs,x.domId);
+      const lignes=(x.lignes||[]).map(l=>{
+        const pid=l.pid || mapNouveaux[l.eqId+'|'+l.gamertag.toLowerCase()];
+        const nl={ pid:pid, eqId:l.eqId, b:l.b, a:l.a };
+        if(l.tirs!==undefined){ nl.arr=l.arr; nl.tirs=l.tirs; }
+        return nl;
+      });
+      return db.collection('tMatchs').add({
+        tournoiId:t.id, phase:'poule', poule:(dom&&dom.poule)||'A',
+        domId:x.domId, domNom:x.domNom, extId:x.extId, extNom:x.extNom,
+        scoreDom:x.butsDom, scoreExt:x.butsExt, joue:true,
+        lignes:lignes, eaMatchId:x.eaMatchId, eaTs:x.timestamp,
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }));
+    fermerModale('modale-import');
+    alert(T('ea.finiPlus').replace('{n}',aImporter.length).replace('{j}',Object.keys(aCreer).length));
+  } catch(e){ alert('Erreur: '+e.message); }
+  finally { if(btn){ btn.disabled=false; btn.textContent=T('ea.confirmer'); } }
 }
 
 /* Classement d'une poule */
