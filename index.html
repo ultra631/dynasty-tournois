@@ -571,6 +571,26 @@ footer a{color:var(--cyan);text-decoration:none}
   </div>
 </div>
 
+<!-- MODALE MODIFIER UNE ÉQUIPE -->
+<div class="modal" id="modale-edit-equipe">
+  <div class="modal-box" style="max-width:440px;text-align:left">
+    <h3>✏️ <span data-i18n="ed.titre">Modifier l'équipe</span></h3>
+    <input type="hidden" id="ed-id">
+    <label class="champ-lbl" data-i18n="ed.nom">Nom de l'équipe</label>
+    <input id="ed-nom">
+    <label class="champ-lbl" data-i18n="ed.eaclub">ID club EA</label>
+    <input id="ed-eaclub" placeholder="ex. 238930">
+    <div class="deux-cols">
+      <div><label class="champ-lbl" data-i18n="ed.poule">Poule</label><select id="ed-poule"></select></div>
+      <div><label class="champ-lbl" data-i18n="ed.couleur">Couleur</label><input id="ed-couleur" type="color" style="height:44px;padding:5px"></div>
+    </div>
+    <div class="cta-row" style="margin-top:14px">
+      <button class="btn btn-cyan" onclick="enregistrerEditEquipe()" data-i18n="ed.enr">Enregistrer</button>
+      <button class="btn btn-ghost" onclick="fermerModale('modale-edit-equipe')" data-i18n="commun.annuler">Annuler</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
@@ -620,7 +640,7 @@ const DICT = {
   'ea.aucunClub':'Aucune équipe n\'a d\'ID club EA. Ajoute-le dans la fiche de l\'équipe.','ea.chargement':'Connexion à EA… (10-20 sec)','ea.erreur':'Erreur de connexion à EA. Réessaie dans quelques minutes.','ea.matchsTrouves':'match(s) trouvé(s)','ea.pretsImport':'prêt(s) à importer','ea.horsLigue':'adversaire hors-tournoi','ea.nul':'égalité (ignoré)','ea.deja':'déjà importé','ea.nonRelies':'joueur(s) non reliés','ea.nouveaux':'nouveaux joueurs','ea.importEnCours':'Import en cours…','ea.rienCoche':'Coche au moins un match.','ea.fini':'{n} match(s) importé(s)! Les stats sont à jour.','ea.finiPlus':'{n} match(s) importé(s) · {j} joueur(s) créé(s)! Les stats sont à jour.',
   'me.titre':'Meilleurs pointeurs','me.joueur':'Joueur','me.equipe':'Équipe','me.b':'B','me.a':'A',
   'nav.stats':'Top Stats','ts.eyebrow':'Meneurs du tournoi','ts.titre':'Top Stats','ts.sous':'Les meilleurs patineurs et gardiens du tournoi.','ts.patineurs':'Patineurs','ts.gardiens':'Gardiens','ts.buteurs':'Top buteurs','ts.passeurs':'Top passeurs','ts.pointeurs':'Top pointeurs','ts.efficacite':'Efficacité (770 = .770)','ts.moyenne':'Moyenne (buts/match)','ts.victoires':'Victoires','ts.aucun':'—','ts.vide.t':'Aucune stat pour l\'instant','ts.vide.s':'Les stats apparaîtront après les premiers matchs importés.',
-  'nav.calendrier':'Calendrier','cal.eyebrow':'Horaire','cal.titre':'Calendrier','cal.sous':'Qui joue contre qui. Les scores s\'affichent une fois les matchs joués.','cal.adm':'Admin · Ajouter un match à l\'horaire','cal.admNote':'Crée les affrontements prévus. Ils se remplissent avec le score quand tu entres/importes le résultat.','cal.ajouter':'Ajouter au calendrier','cal.ph.heure':'Heure (ex. 20h00) — optionnel','man.titre':'Entrer le match manuellement','man.joueurs':'Joueurs (optionnel — pour les stats)','man.ajLigne':'+ Ajouter un joueur','man.enr':'Enregistrer le match','man.nomJoueur':'Nom / gamertag','man.patineur':'Patineur','man.gardien':'Gardien','man.buts':'Buts','man.passes':'Passes','man.points':'Points','man.tirs':'Tirs','man.arrets':'Arrêts','man.eff':'Eff.','man.besoinScore':'Entre les deux scores.','man.enrEnCours':'Enregistrement…','man.reset':'🗑️ Reset','man.resetConfirm':'Effacer complètement ce match (score + joueurs) ? Il disparaîtra du classement.','man.prolong':'Match terminé en prolongation (le perdant obtient 1 point)','eqr.vide':'Aucun joueur avec des stats pour cette équipe pour l\'instant.','ts.moyPts':'Moyenne pts/match','ts.effCourt':'Eff.','ts.moyCourt':'Moy.','cal.vide.t':'Horaire à venir','cal.vide.s':'Les affrontements prévus apparaîtront ici.',
+  'nav.calendrier':'Calendrier','cal.eyebrow':'Horaire','cal.titre':'Calendrier','cal.sous':'Qui joue contre qui. Les scores s\'affichent une fois les matchs joués.','cal.adm':'Admin · Ajouter un match à l\'horaire','cal.admNote':'Crée les affrontements prévus. Ils se remplissent avec le score quand tu entres/importes le résultat.','cal.ajouter':'Ajouter au calendrier','cal.ph.heure':'Heure (ex. 20h00) — optionnel','man.titre':'Entrer le match manuellement','man.joueurs':'Joueurs (optionnel — pour les stats)','man.ajLigne':'+ Ajouter un joueur','man.enr':'Enregistrer le match','man.nomJoueur':'Nom / gamertag','man.patineur':'Patineur','man.gardien':'Gardien','man.buts':'Buts','man.passes':'Passes','man.points':'Points','man.tirs':'Tirs','man.arrets':'Arrêts','man.eff':'Eff.','man.besoinScore':'Entre les deux scores.','man.enrEnCours':'Enregistrement…','man.reset':'🗑️ Reset','man.resetConfirm':'Effacer complètement ce match (score + joueurs) ? Il disparaîtra du classement.','man.prolong':'Match terminé en prolongation (le perdant obtient 1 point)','eqr.vide':'Aucun joueur avec des stats pour cette équipe pour l\'instant.','ts.moyPts':'Moyenne pts/match','ts.effCourt':'Eff.','ts.moyCourt':'Moy.','ed.titre':'Modifier l\'équipe','ed.nom':'Nom de l\'équipe','ed.eaclub':'ID club EA','ed.poule':'Poule','ed.couleur':'Couleur','ed.enr':'Enregistrer','cal.vide.t':'Horaire à venir','cal.vide.s':'Les affrontements prévus apparaîtront ici.',
   'po.poule':'Poule','po.tourNul':'Aucun tournoi','po.tourNul.s':'Crée un tournoi pour commencer.','po.eqVide':'Aucune équipe','po.eqVide.s':'Les équipes confirmées apparaîtront ici, réparties en poules.','po.3e':'Match pour la 3e place',
   'col.eq':'Équipe','col.pj':'PJ','col.v':'V','col.d':'DR','col.dp':'DP','col.bp':'BP','col.bc':'BC','col.diff':'+/-','col.pts':'PTS',
   'br.eyebrow':'La route vers la Coupe','br.titre':'Éliminatoires','br.sous':'Le tableau des séries. Le dernier debout soulève la Coupe.',
@@ -657,7 +677,7 @@ const DICT = {
   'ea.aucunClub':'No team has an EA club ID. Add it in the team\'s details.','ea.chargement':'Connecting to EA… (10-20 sec)','ea.erreur':'EA connection error. Try again in a few minutes.','ea.matchsTrouves':'match(es) found','ea.pretsImport':'ready to import','ea.horsLigue':'opponent not in tournament','ea.nul':'tie (skipped)','ea.deja':'already imported','ea.nonRelies':'unlinked player(s)','ea.nouveaux':'new players','ea.importEnCours':'Importing…','ea.rienCoche':'Check at least one match.','ea.fini':'{n} match(es) imported! Stats are up to date.','ea.finiPlus':'{n} match(es) imported · {j} player(s) created! Stats are up to date.',
   'me.titre':'Top scorers','me.joueur':'Player','me.equipe':'Team','me.b':'G','me.a':'A',
   'nav.stats':'Top Stats','ts.eyebrow':'Tournament leaders','ts.titre':'Top Stats','ts.sous':'The tournament\'s best skaters and goalies.','ts.patineurs':'Skaters','ts.gardiens':'Goalies','ts.buteurs':'Top goal scorers','ts.passeurs':'Top playmakers','ts.pointeurs':'Top point leaders','ts.efficacite':'Save pct (770 = .770)','ts.moyenne':'GAA (goals/game)','ts.victoires':'Wins','ts.aucun':'—','ts.vide.t':'No stats yet','ts.vide.s':'Stats will appear after the first imported matches.',
-  'nav.calendrier':'Schedule','cal.eyebrow':'Schedule','cal.titre':'Schedule','cal.sous':'Who plays who. Scores show up once matches are played.','cal.adm':'Admin · Add a match to the schedule','cal.admNote':'Create the planned matchups. They fill in with the score when you enter/import the result.','cal.ajouter':'Add to schedule','cal.ph.heure':'Time (e.g. 8:00pm) — optional','man.titre':'Enter match manually','man.joueurs':'Players (optional — for stats)','man.ajLigne':'+ Add a player','man.enr':'Save match','man.nomJoueur':'Name / gamertag','man.patineur':'Skater','man.gardien':'Goalie','man.buts':'Goals','man.passes':'Assists','man.points':'Points','man.tirs':'Shots','man.arrets':'Saves','man.eff':'Sv','man.besoinScore':'Enter both scores.','man.enrEnCours':'Saving…','man.reset':'🗑️ Reset','man.resetConfirm':'Completely delete this match (score + players)? It will disappear from the standings.','man.prolong':'Match ended in overtime (loser gets 1 point)','eqr.vide':'No players with stats for this team yet.','ts.moyPts':'Points/game avg','ts.effCourt':'Sv','ts.moyCourt':'GAA','cal.vide.t':'Schedule coming soon','cal.vide.s':'Planned matchups will appear here.',
+  'nav.calendrier':'Schedule','cal.eyebrow':'Schedule','cal.titre':'Schedule','cal.sous':'Who plays who. Scores show up once matches are played.','cal.adm':'Admin · Add a match to the schedule','cal.admNote':'Create the planned matchups. They fill in with the score when you enter/import the result.','cal.ajouter':'Add to schedule','cal.ph.heure':'Time (e.g. 8:00pm) — optional','man.titre':'Enter match manually','man.joueurs':'Players (optional — for stats)','man.ajLigne':'+ Add a player','man.enr':'Save match','man.nomJoueur':'Name / gamertag','man.patineur':'Skater','man.gardien':'Goalie','man.buts':'Goals','man.passes':'Assists','man.points':'Points','man.tirs':'Shots','man.arrets':'Saves','man.eff':'Sv','man.besoinScore':'Enter both scores.','man.enrEnCours':'Saving…','man.reset':'🗑️ Reset','man.resetConfirm':'Completely delete this match (score + players)? It will disappear from the standings.','man.prolong':'Match ended in overtime (loser gets 1 point)','eqr.vide':'No players with stats for this team yet.','ts.moyPts':'Points/game avg','ts.effCourt':'Sv','ts.moyCourt':'GAA','ed.titre':'Edit team','ed.nom':'Team name','ed.eaclub':'EA club ID','ed.poule':'Group','ed.couleur':'Color','ed.enr':'Save','cal.vide.t':'Schedule coming soon','cal.vide.s':'Planned matchups will appear here.',
   'po.poule':'Group','po.tourNul':'No tournament','po.tourNul.s':'Create a tournament to get started.','po.eqVide':'No teams','po.eqVide.s':'Confirmed teams will appear here, split into groups.','po.3e':'Third-place match',
   'col.eq':'Team','col.pj':'GP','col.v':'W','col.d':'RL','col.dp':'OTL','col.bp':'GF','col.bc':'GA','col.diff':'+/-','col.pts':'PTS',
   'br.eyebrow':'The road to the Cup','br.titre':'Playoffs','br.sous':'The playoff bracket. The last one standing lifts the Cup.',
@@ -1113,6 +1133,31 @@ function ajouterEquipe(){
 }
 function supprimerEquipe(id){ if(confirm('Retirer cette équipe ?')) db.collection('tEquipes').doc(id).delete().catch(e=>alert(e.message)); }
 
+/* Modifier une équipe (nom, ID club EA, poule, couleur) */
+function ouvrirEditEquipe(id){
+  const t=tournoiParId(tournoiActif); if(!t) return;
+  const eq=eqParId(equipesDuTournoi(t.id), id); if(!eq) return;
+  document.getElementById('ed-id').value=id;
+  document.getElementById('ed-nom').value=eq.nom||'';
+  document.getElementById('ed-eaclub').value=eq.eaClubId||'';
+  document.getElementById('ed-couleur').value=eq.couleur||'#38C6E6';
+  // options de poule
+  const sel=document.getElementById('ed-poule');
+  sel.innerHTML=lettresPoules(t.nbPoules).map(L=>'<option value="'+L+'"'+((eq.poule||'A')===L?' selected':'')+'>'+T('po.poule')+' '+L+'</option>').join('');
+  document.getElementById('modale-edit-equipe').classList.add('open');
+}
+function enregistrerEditEquipe(){
+  const id=document.getElementById('ed-id').value;
+  const nom=document.getElementById('ed-nom').value.trim();
+  const eaClubId=document.getElementById('ed-eaclub').value.trim();
+  const poule=document.getElementById('ed-poule').value||'A';
+  const couleur=document.getElementById('ed-couleur').value;
+  if(!nom){ alert('Nom requis.'); return; }
+  db.collection('tEquipes').doc(id).update({nom, eaClubId, poule, couleur})
+    .then(()=>fermerModale('modale-edit-equipe'))
+    .catch(e=>alert(e.message));
+}
+
 /* ===================== JOUEURS (pour relier les stats EA) ===================== */
 function ajouterJoueur(){
   const t=tournoiParId(tournoiActif); if(!t){ alert('Choisis un tournoi.'); return; }
@@ -1379,11 +1424,11 @@ function rendrePoules(){
       });
       html+='</div>';
     }
-    // liste admin des équipes (pour supprimer)
+    // liste admin des équipes (pour modifier / supprimer)
     if(estAdmin){
       const dansL=eqs.filter(e=>(e.poule||'A')===L);
       html+='<div class="admin-only" style="margin:-8px 0 20px;display:flex;gap:8px;flex-wrap:wrap">'
-        +dansL.map(e=>'<span style="font-size:12px;color:var(--argent);border:1px solid var(--bordure);border-radius:99px;padding:4px 10px">'+esc(e.nom)+' <a onclick="supprimerEquipe(\''+e.id+'\')" style="color:var(--rouge);cursor:pointer">✕</a></span>').join('')
+        +dansL.map(e=>'<span style="font-size:12px;color:var(--argent);border:1px solid var(--bordure);border-radius:99px;padding:4px 10px;display:inline-flex;align-items:center;gap:7px">'+esc(e.nom)+(e.eaClubId?' <em style="color:var(--cyan);font-style:normal">#'+esc(e.eaClubId)+'</em>':'')+' <a onclick="ouvrirEditEquipe(\''+e.id+'\')" style="cursor:pointer" title="Modifier">✏️</a> <a onclick="supprimerEquipe(\''+e.id+'\')" style="color:var(--rouge);cursor:pointer" title="Retirer">✕</a></span>').join('')
         +'</div>';
     }
   });
